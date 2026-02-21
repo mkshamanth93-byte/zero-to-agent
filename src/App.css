@@ -878,6 +878,19 @@ kbd {
 }
 
 /* Tool selection */
+.ob-tool-section { margin-bottom: 1.5rem; }
+.ob-tool-section-label {
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;
+  color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);
+}
+.ob-tool-section--highlight {
+  background: rgba(99,102,241,0.04); border: 1px solid rgba(99,102,241,0.15);
+  border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem;
+}
+.ob-tool-section--highlight .ob-tool-section-label {
+  color: var(--accent); border-bottom-color: rgba(99,102,241,0.2);
+}
 .ob-tool-group { margin-bottom: 1rem; }
 .ob-tool-group-label {
   font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em;
@@ -892,6 +905,12 @@ kbd {
 .ob-tool-chip:hover { border-color: var(--accent); color: var(--text); }
 .ob-tool-chip--selected {
   border-color: var(--accent); background: rgba(99,102,241,0.1); color: var(--accent-2);
+}
+.ob-tool-chip--industry {
+  border-color: rgba(99,102,241,0.25); color: var(--text);
+}
+.ob-tool-chip--industry.ob-tool-chip--selected {
+  background: rgba(99,102,241,0.15);
 }
 
 /* Form footer / CTA */

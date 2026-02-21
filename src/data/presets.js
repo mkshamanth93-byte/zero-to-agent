@@ -7,7 +7,7 @@ export const PRESETS = {
   deekshita: {
     name: 'Deekshita',
     role: 'Data Scientist — recently completed a Masters in Data Science, now moving into agentic AI workflows, multi-agent orchestration, and building intelligent automation systems',
-    industry: 'tech-career',
+    industry: 'data-ai',
     businessType: 'individual',
     goalTrack: 'career',
     automationGoal: 'Automatically find relevant ML/Data Science/AI Engineer roles on LinkedIn, score them against my profile, draft tailored cover letters, and queue applications for my review before submitting',

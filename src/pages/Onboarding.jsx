@@ -1,104 +1,28 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useUserProfile, EMPTY_PROFILE } from '../hooks/useUserProfile'
-import { INDUSTRY_OPTIONS, BUSINESS_TYPES, GOAL_TRACKS, COMMON_TOOLS, INDUSTRY_TEMPLATES } from '../data/industryTemplates'
+import {
+  INDUSTRY_OPTIONS, BUSINESS_TYPES, GOAL_TRACKS, COMMON_TOOLS,
+  INDUSTRY_TEMPLATES, getToolsForIndustry, getContextualTip,
+} from '../data/industryTemplates'
 import { generateCourseProfile } from '../utils/generateCourse'
 import { generateWithLLM, GENERATION_STAGES } from '../utils/llmGenerate'
 import { PRESETS } from '../data/presets'
 
-const TOTAL_STEPS = 5   // 1=who, 2=what, 3=tools, 4=generate, 5=preview
+const TOTAL_STEPS = 6
 
 // ─── Tips panel ──────────────────────────────────────────────────────────────
-const TIPS = {
-  1: {
-    default: {
-      heading: 'This course adapts to you.',
-      body: 'The more specific you are here, the more your course content, MEMORY.md, and final project will match your actual world. Take 2 minutes — it shapes the next 30 days.',
-      examples: [],
-    },
-    role: {
-      heading: 'Be specific about what you actually do.',
-      body: 'Not your job title — what you do day-to-day, what software you deal with, what problems land on your desk.',
-      examples: [
-        '"Dental practice owner — 4-chair clinic, patient scheduling, Xero invoicing, insurance claims"',
-        '"HR Manager at a 60-person startup — recruitment, onboarding, engagement surveys"',
-        '"Freelance financial consultant — management accounts for SMB clients in QuickBooks"',
-        '"Data Scientist at a retail bank — ML models, moving into agentic AI"',
-      ],
-    },
-    industry: { heading: 'Pick the closest match.', body: 'If you\'re between two — pick where you spend most automation energy.', examples: [] },
-    businessType: { heading: 'How big is the world this agent operates in?', body: 'This affects the complexity of systems and scale of automation we design.', examples: [] },
-  },
-  2: {
-    default: {
-      heading: 'What do you want this agent to do?',
-      body: 'Think about your week. What takes hours but follows the same pattern every time? That\'s your target.',
-      examples: [],
-    },
-    goalTrack: { heading: 'One primary goal. The agent builds toward it for 30 days.', body: 'You can only pick one — choose where you want the final project to land.', examples: [] },
-    automationGoal: {
-      heading: 'The task you\'d automate first.',
-      body: 'The most painful, repeated thing in your week. The one you dread doing manually.',
-      examples: [
-        '"3 hours every Monday chasing overdue invoices by email"',
-        '"Screening 50 CVs a week against a job spec — I want the top 5 surfaced"',
-        '"Writing cover letters for roles I find — takes an hour each"',
-        '"Reconciling bank transactions in Xero and explaining the unmatched ones"',
-      ],
-    },
-    projectDescription: {
-      heading: 'Describe your system clearly.',
-      body: 'Name the software it connects to. Describe what runs automatically and what you approve before it acts. This becomes your Module 7 brief.',
-      examples: [
-        '"Connect Dentally PMS to Xero — auto-invoice when treatment completes, flag insurance claims over 30 days old"',
-        '"Recruitment engine — takes a job brief, writes JD, screens CVs, sends shortlist to Telegram for my review"',
-        '"Monthly management accounts — pull P&L from Xero, generate commentary, save as Word doc for my sign-off"',
-      ],
-    },
-  },
-  3: {
-    default: {
-      heading: 'What systems does your agent need to connect to?',
-      body: 'Tick everything in your stack. Your MEMORY.md and Module 7 build will reference these specifically. If it\'s not in the list, add it in the text box.',
-      examples: [],
-    },
-    successVision: {
-      heading: 'What does "done" feel like?',
-      body: 'Describe the specific moment when you know this was worth 30 days.',
-      examples: [
-        '"I wake up and Telegram has 3 new job matches, scored and with draft applications ready for my review"',
-        '"My practice runs patient reminders without me. Xero reconciles overnight. I just see exceptions."',
-        '"I paste a JD and 60 seconds later I have a company brief, skills match, and draft cover letter"',
-      ],
-    },
-  },
-  4: {
-    default: {
-      heading: 'This is the intelligence step.',
-      body: 'Your OpenAI key is used for one generation call (~$0.002) to write your personalised MEMORY.md, your specific Module 7 project brief, and tailored examples for every module. The key is never stored.',
-      examples: [],
-    },
-  },
-  5: {
-    default: {
-      heading: 'Your course is ready.',
-      body: 'Review what\'s been generated. Everything is editable — your MEMORY.md in Module 2, your project scope in Module 7. This is your starting point.',
-      examples: [],
-    },
-  },
-}
 
 function TipsPanel({ step, activeField, profile }) {
-  const stepTips = TIPS[step] || {}
-  const tip = (activeField && stepTips[activeField]) || stepTips.default || TIPS[1].default
-  const industryTemplate = profile.industry && INDUSTRY_TEMPLATES[profile.industry]
+  const tip = getContextualTip(step, activeField, profile)
+  const industry = INDUSTRY_TEMPLATES[profile.industry]
 
   return (
     <div className="ob-tips-col">
       <motion.div
         className="ob-tips-panel"
-        key={tip.heading}
+        key={`${step}-${activeField}-${profile.industry}-${profile.goalTrack}`}
         initial={{ opacity: 0, x: 12 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
@@ -119,15 +43,15 @@ function TipsPanel({ step, activeField, profile }) {
         )}
       </motion.div>
 
-      {step >= 1 && industryTemplate && profile.industry !== 'other' && (
+      {step >= 2 && industry && profile.industry !== 'other' && (
         <motion.div
           className="ob-tips-use-cases"
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <div className="ob-tips-use-cases-label">What {industryTemplate.label} teams automate:</div>
-          {(industryTemplate.useCases || []).slice(0, 3).map((uc, i) => (
+          <div className="ob-tips-use-cases-label">What {industry.label} teams automate:</div>
+          {(industry.useCases || []).slice(0, 3).map((uc, i) => (
             <div key={i} className="ob-tips-use-case-item">→ {uc}</div>
           ))}
         </motion.div>
@@ -147,13 +71,61 @@ function ProgressBar({ step }) {
   )
 }
 
-// ─── Step 1: Who You Are ──────────────────────────────────────────────────────
-function Step1({ form, onChange, onFocus }) {
+// ─── Step 1: Industry + Business Scale ────────────────────────────────────────
+function StepIndustry({ form, onChange, onFocus }) {
   return (
     <div className="ob-step">
       <div className="ob-step-heading">
-        <h2>Tell us about your world.</h2>
-        <p>The more specific you are, the more your course adapts to what you actually do.</p>
+        <h2>What world do you operate in?</h2>
+        <p>Everything downstream — examples, tools, projects, guidance — adapts from this choice.</p>
+      </div>
+      <div className="ob-field">
+        <label className="ob-label">Your industry</label>
+        <div className="ob-pill-grid" onFocus={() => onFocus('industry')}>
+          {INDUSTRY_OPTIONS.map(opt => (
+            <button key={opt.id} type="button"
+              className={`ob-pill ${form.industry === opt.id ? 'ob-pill--selected' : ''}`}
+              onClick={() => { onChange('industry', opt.id); onFocus('industry') }}>
+              <span className="ob-pill-icon">{opt.icon}</span>
+              <span className="ob-pill-label">{opt.label}</span>
+              <span className="ob-pill-desc">{opt.description}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      {form.industry && (
+        <motion.div className="ob-field" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }}>
+          <label className="ob-label">Business scale</label>
+          <div className="ob-segment" onFocus={() => onFocus('businessType')}>
+            {BUSINESS_TYPES.map(bt => (
+              <button key={bt.id} type="button"
+                className={`ob-segment-btn ${form.businessType === bt.id ? 'ob-segment-btn--active' : ''}`}
+                onClick={() => { onChange('businessType', bt.id); onFocus('businessType') }}>
+                <span className="ob-segment-label">{bt.label}</span>
+                <span className="ob-segment-desc">{bt.desc}</span>
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      )}
+    </div>
+  )
+}
+
+// ─── Step 2: About You ───────────────────────────────────────────────────────
+function StepAboutYou({ form, onChange, onFocus }) {
+  const industry = INDUSTRY_TEMPLATES[form.industry]
+  const placeholder = industry?.roleExamples?.[0] || '"Dental practice owner — 4-chair clinic, patient scheduling, Xero invoicing, insurance claims"'
+
+  return (
+    <div className="ob-step">
+      <div className="ob-step-heading">
+        <h2>Tell us about you.</h2>
+        <p>
+          {industry
+            ? `You're in ${industry.label}. Now describe what you actually do — the more specific, the better your course adapts.`
+            : 'The more specific you are, the more your course adapts to your actual world.'}
+        </p>
       </div>
       <div className="ob-field">
         <label className="ob-label">Your name</label>
@@ -163,47 +135,30 @@ function Step1({ form, onChange, onFocus }) {
       <div className="ob-field">
         <label className="ob-label">What do you do? <span className="ob-label-hint">Your role, context, and what you deal with day-to-day</span></label>
         <textarea className="ob-textarea" rows={3}
-          placeholder='"Dental practice owner — 4-chair clinic, patient scheduling, Xero invoicing, insurance claims"'
+          placeholder={placeholder}
           value={form.role} onChange={e => onChange('role', e.target.value)} onFocus={() => onFocus('role')} />
-      </div>
-      <div className="ob-field">
-        <label className="ob-label">Your industry</label>
-        <div className="ob-pill-grid" onFocus={() => onFocus('industry')}>
-          {INDUSTRY_OPTIONS.map(opt => (
-            <button key={opt.id} type="button"
-              className={`ob-pill ${form.industry === opt.id ? 'ob-pill--selected' : ''}`}
-              onClick={() => onChange('industry', opt.id)}>
-              <span className="ob-pill-icon">{opt.icon}</span>
-              <span className="ob-pill-label">{opt.label}</span>
-              <span className="ob-pill-desc">{opt.description}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="ob-field">
-        <label className="ob-label">Business scale</label>
-        <div className="ob-segment" onFocus={() => onFocus('businessType')}>
-          {BUSINESS_TYPES.map(bt => (
-            <button key={bt.id} type="button"
-              className={`ob-segment-btn ${form.businessType === bt.id ? 'ob-segment-btn--active' : ''}`}
-              onClick={() => onChange('businessType', bt.id)}>
-              <span className="ob-segment-label">{bt.label}</span>
-              <span className="ob-segment-desc">{bt.desc}</span>
-            </button>
-          ))}
-        </div>
       </div>
     </div>
   )
 }
 
-// ─── Step 2: What to Build ────────────────────────────────────────────────────
-function Step2({ form, onChange, onFocus }) {
+// ─── Step 3: What to Build ────────────────────────────────────────────────────
+function StepGoal({ form, onChange, onFocus }) {
+  const industry = INDUSTRY_TEMPLATES[form.industry]
+  const goalTrack = GOAL_TRACKS.find(g => g.id === form.goalTrack)
+  const trackKey = form.goalTrack || 'business'
+  const automationExamples = industry?.automationExamples?.[trackKey] || []
+  const automationPlaceholder = automationExamples[0] || '"I spend 3 hours every Monday chasing overdue invoices by email. I want the agent to draft those for me."'
+
   return (
     <div className="ob-step">
       <div className="ob-step-heading">
         <h2>What do you want to build?</h2>
-        <p>This shapes your Module 7 project and the examples throughout the course.</p>
+        <p>
+          {industry
+            ? `For ${industry.label} — this shapes your Module 7 project and the examples throughout the course.`
+            : 'This shapes your Module 7 project and the examples throughout the course.'}
+        </p>
       </div>
       <div className="ob-field" onFocus={() => onFocus('goalTrack')}>
         <label className="ob-label">Your primary goal</label>
@@ -211,7 +166,7 @@ function Step2({ form, onChange, onFocus }) {
           {GOAL_TRACKS.map(track => (
             <button key={track.id} type="button"
               className={`ob-track-card ${form.goalTrack === track.id ? 'ob-track-card--selected' : ''}`}
-              onClick={() => onChange('goalTrack', track.id)}>
+              onClick={() => { onChange('goalTrack', track.id); onFocus('automationGoal') }}>
               <div className="ob-track-icon">{track.icon}</div>
               <div className="ob-track-label">{track.label}</div>
               <div className="ob-track-desc">{track.desc}</div>
@@ -222,72 +177,135 @@ function Step2({ form, onChange, onFocus }) {
           ))}
         </div>
       </div>
-      <div className="ob-field">
-        <label className="ob-label">The one thing you'd automate first <span className="ob-label-hint">— what repeated task takes the most of your time?</span></label>
-        <textarea className="ob-textarea" rows={3}
-          placeholder='"I spend 3 hours every Monday chasing overdue invoices by email. I want the agent to draft those for me."'
-          value={form.automationGoal} onChange={e => onChange('automationGoal', e.target.value)} onFocus={() => onFocus('automationGoal')} />
-      </div>
+      {form.goalTrack && (
+        <motion.div className="ob-field" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}>
+          <label className="ob-label">
+            {form.goalTrack === 'career' ? 'What would an agent help you with in your career?' :
+             form.goalTrack === 'personal' ? 'What repeated task in your life would you automate?' :
+             'The one thing you\'d automate first'}
+            <span className="ob-label-hint"> — this becomes your Module 7 seed</span>
+          </label>
+          <textarea className="ob-textarea" rows={3}
+            placeholder={automationPlaceholder}
+            value={form.automationGoal} onChange={e => onChange('automationGoal', e.target.value)} onFocus={() => onFocus('automationGoal')} />
+        </motion.div>
+      )}
       {form.goalTrack === 'project' && (
         <motion.div className="ob-field" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} transition={{ duration: 0.3 }}>
           <label className="ob-label">Describe your project <span className="ob-label-hint">— what connects to what, what runs automatically, what you approve</span></label>
           <textarea className="ob-textarea ob-textarea--large" rows={5}
-            placeholder={'"Connect my Dentally PMS to Xero — when a treatment is completed, auto-generate an invoice. Flag insurance claims over 30 days old. I want to approve each invoice before it\'s sent."'}
+            placeholder={industry?.automationExamples?.project?.[0] || '"Connect my PMS to Xero — when a job completes, auto-generate an invoice. I want to approve each invoice before it\'s sent."'}
             value={form.projectDescription} onChange={e => onChange('projectDescription', e.target.value)} onFocus={() => onFocus('projectDescription')} />
-          <div className="ob-field-note">💡 Name the software. Describe the flow. This becomes your Module 7 project brief.</div>
+          <div className="ob-field-note">Name the software. Describe the flow. This becomes your Module 7 project brief.</div>
         </motion.div>
       )}
     </div>
   )
 }
 
-// ─── Step 3: Tools ────────────────────────────────────────────────────────────
-function Step3({ form, onChange, onFocus }) {
+// ─── Step 4: Tools ────────────────────────────────────────────────────────────
+function StepTools({ form, onChange, onFocus }) {
+  const industry = INDUSTRY_TEMPLATES[form.industry]
+  const { specific, common } = getToolsForIndustry(form.industry)
+
   const toggleTool = (id) => {
     const current = form.tools || []
     onChange('tools', current.includes(id) ? current.filter(t => t !== id) : [...current, id])
   }
-  const grouped = COMMON_TOOLS.reduce((acc, t) => { (acc[t.category] = acc[t.category] || []).push(t); return acc }, {})
-  const labels = { accounting: 'Accounting & Finance', crm: 'CRM & Sales', comms: 'Communication', productivity: 'Productivity', dev: 'Development', ecommerce: 'E-commerce', payments: 'Payments' }
+
+  const groupByCategory = (tools) => {
+    return tools.reduce((acc, t) => {
+      (acc[t.category] = acc[t.category] || []).push(t)
+      return acc
+    }, {})
+  }
+
+  const categoryLabels = {
+    accounting: 'Accounting & Finance', crm: 'CRM & Sales', comms: 'Communication',
+    productivity: 'Productivity', dev: 'Development', ecommerce: 'E-commerce',
+    payments: 'Payments', healthcare: 'Healthcare', dental: 'Dental',
+    legal: 'Legal', hr: 'HR & Recruitment', hospitality: 'Hospitality',
+    creative: 'Creative', marketing: 'Marketing & Ads', 'real-estate': 'Real Estate',
+    education: 'Education', social: 'Social', documents: 'Documents', automation: 'Automation',
+  }
+
+  const specificGrouped = groupByCategory(specific)
+  const commonGrouped = groupByCategory(common)
+
   return (
     <div className="ob-step">
       <div className="ob-step-heading">
         <h2>What tools do you already use?</h2>
-        <p>Tick everything in your stack. Your MEMORY.md and project build will reference these specifically.</p>
+        <p>
+          {industry
+            ? `We've highlighted tools common in ${industry.label}. Tick everything in your stack — your MEMORY.md and project build will reference these specifically.`
+            : 'Tick everything in your stack. Your MEMORY.md and project build will reference these specifically.'}
+        </p>
       </div>
       <div className="ob-field" onFocus={() => onFocus('default')}>
-        {Object.entries(grouped).map(([cat, tools]) => (
-          <div key={cat} className="ob-tool-group">
-            <div className="ob-tool-group-label">{labels[cat] || cat}</div>
-            <div className="ob-tool-chips">
-              {tools.map(tool => (
-                <button key={tool.id} type="button"
-                  className={`ob-tool-chip ${(form.tools || []).includes(tool.id) ? 'ob-tool-chip--selected' : ''}`}
-                  onClick={() => toggleTool(tool.id)}>{tool.label}</button>
-              ))}
-            </div>
+        {/* Industry-specific tools first */}
+        {Object.keys(specificGrouped).length > 0 && (
+          <div className="ob-tool-section ob-tool-section--highlight">
+            <div className="ob-tool-section-label">{industry?.label || 'Industry'} tools</div>
+            {Object.entries(specificGrouped).map(([cat, tools]) => (
+              <div key={cat} className="ob-tool-group">
+                <div className="ob-tool-group-label">{categoryLabels[cat] || cat}</div>
+                <div className="ob-tool-chips">
+                  {tools.map(tool => (
+                    <button key={tool.id} type="button"
+                      className={`ob-tool-chip ob-tool-chip--industry ${(form.tools || []).includes(tool.id) ? 'ob-tool-chip--selected' : ''}`}
+                      onClick={() => toggleTool(tool.id)}>{tool.label}</button>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        )}
+
+        {/* Common tools */}
+        <div className="ob-tool-section">
+          <div className="ob-tool-section-label">Common tools</div>
+          {Object.entries(commonGrouped).map(([cat, tools]) => (
+            <div key={cat} className="ob-tool-group">
+              <div className="ob-tool-group-label">{categoryLabels[cat] || cat}</div>
+              <div className="ob-tool-chips">
+                {tools.map(tool => (
+                  <button key={tool.id} type="button"
+                    className={`ob-tool-chip ${(form.tools || []).includes(tool.id) ? 'ob-tool-chip--selected' : ''}`}
+                    onClick={() => toggleTool(tool.id)}>{tool.label}</button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+
         <div className="ob-tool-group">
           <div className="ob-tool-group-label">Other / Custom</div>
-          <input className="ob-input" type="text" placeholder="e.g. Dentally, Practice Panther, Cin7, your in-house software..."
+          <input className="ob-input" type="text"
+            placeholder={industry?.industryTools?.[0] ? `e.g. ${industry.industryTools.slice(0, 3).join(', ')}, your in-house software...` : 'e.g. your in-house software, niche tools...'}
             value={form.customTool} onChange={e => onChange('customTool', e.target.value)} />
         </div>
       </div>
       <div className="ob-field">
         <label className="ob-label">What does success look like? <span className="ob-label-hint">— the moment you know this was worth 30 days</span></label>
         <textarea className="ob-textarea" rows={3}
-          placeholder="&quot;I wake up and Telegram has already sent me today's priority exceptions, drafted invoice chasers, and queued 3 job applications. I just review and approve.&quot;"
+          placeholder={
+            form.goalTrack === 'career'
+              ? '"I wake up and my agent has found 3 well-matched roles, drafted applications, and they\'re ready for my review."'
+              : form.goalTrack === 'personal'
+                ? '"My morning starts with a briefing. The routine is on autopilot. I just handle exceptions."'
+                : '"My operations run on autopilot. The agent handles the routine. I just review exceptions and approve the important ones."'
+          }
           value={form.successVision} onChange={e => onChange('successVision', e.target.value)} onFocus={() => onFocus('successVision')} />
       </div>
     </div>
   )
 }
 
-// ─── Step 4: Generate ─────────────────────────────────────────────────────────
-function Step4({ form, onGenerated, onSkip }) {
+// ─── Step 5: Generate ─────────────────────────────────────────────────────────
+function StepGenerate({ form, onGenerated, onSkip }) {
   const [apiKey, setApiKey] = useState('')
-  const [status, setStatus] = useState('idle') // 'idle' | 'validating' | 'generating' | 'done' | 'error'
+  const [status, setStatus] = useState('idle')
   const [error, setError] = useState('')
   const [currentStage, setCurrentStage] = useState(null)
   const [completedStages, setCompletedStages] = useState([])
@@ -298,11 +316,10 @@ function Step4({ form, onGenerated, onSkip }) {
       return
     }
     setError('')
-    setStatus('validating')
+    setStatus('generating')
     setCompletedStages([])
 
     try {
-      // Animate through stages while generation runs
       let stageIndex = 0
       const advanceStage = () => {
         if (stageIndex < GENERATION_STAGES.length) {
@@ -315,8 +332,6 @@ function Step4({ form, onGenerated, onSkip }) {
           }, stage.duration)
         }
       }
-
-      setStatus('generating')
       advanceStage()
 
       const generated = await generateWithLLM(apiKey.trim(), form, (stageId) => {
@@ -422,16 +437,15 @@ function Step4({ form, onGenerated, onSkip }) {
   )
 }
 
-// ─── Step 5: Preview ──────────────────────────────────────────────────────────
-function Step5({ form, generatedContent }) {
+// ─── Step 6: Preview ──────────────────────────────────────────────────────────
+function StepPreview({ form, generatedContent }) {
   const courseData = (() => {
     try {
-      const profileWithGen = { ...form, generatedContent }
-      return generateCourseProfile(profileWithGen)
+      return generateCourseProfile({ ...form, generatedContent })
     } catch { return null }
   })()
 
-  const template = INDUSTRY_TEMPLATES[form.industry] || INDUSTRY_TEMPLATES['tech-career']
+  const template = INDUSTRY_TEMPLATES[form.industry] || INDUSTRY_TEMPLATES['other']
   const isGenerated = Boolean(generatedContent)
 
   return (
@@ -521,7 +535,6 @@ export default function Onboarding() {
   const { saveProfile } = useUserProfile()
   const [step, setStep] = useState(0)
   const [form, setForm] = useState(() => {
-    // Pre-fill from ?for=<preset> query param if present
     const presetKey = searchParams.get('for')
     const preset = presetKey && PRESETS[presetKey.toLowerCase()]
     return preset ? { ...EMPTY_PROFILE, ...preset } : { ...EMPTY_PROFILE }
@@ -534,15 +547,15 @@ export default function Onboarding() {
   const onFocus = (field) => setActiveField(field)
 
   const canProceed = () => {
-    if (step === 1) return form.name.trim() && form.role.trim() && form.industry && form.businessType
-    if (step === 2) return form.goalTrack && form.automationGoal.trim()
+    if (step === 1) return form.industry && form.businessType
+    if (step === 2) return form.name.trim() && form.role.trim()
+    if (step === 3) return form.goalTrack && form.automationGoal.trim()
     return true
   }
 
   const handleNext = () => {
     if (step === 0) { setStep(1); return }
     if (step < TOTAL_STEPS) { setStep(s => s + 1); setActiveField(null); return }
-    // Final submit
     saveProfile(form, generatedContent)
     navigate('/')
   }
@@ -555,12 +568,12 @@ export default function Onboarding() {
 
   const handleGenerated = (content) => {
     setGeneratedContent(content)
-    setStep(5) // advance to preview
+    setStep(6)
   }
 
   const handleSkipGeneration = () => {
     setGeneratedContent(null)
-    setStep(5)
+    setStep(6)
   }
 
   // ── Landing ───────────────────────────────────────────────────────────────
@@ -579,16 +592,16 @@ export default function Onboarding() {
                 Hey {form.name}. Your course<br />is waiting.
               </h1>
               <p className="ob-landing-desc">
-                Your profile is pre-filled. Review it in the next step, adjust anything that's off, then generate your personalised course — your MEMORY.md, your project brief, your tailored examples.
+                Your profile is pre-filled. Review it in the next steps, adjust anything that's off, then generate your personalised course — your MEMORY.md, your project brief, your tailored examples.
               </p>
             </>
           ) : (
-            <h1 className="ob-landing-title">Build your personal AI.<br />Tailored to your world.</h1>
-          )}
-          {!isPreset && (
-            <p className="ob-landing-desc">
-              This isn't a generic AI course. Answer a few questions about your industry, your tools, and what you want to automate — and the course adapts: the examples, the projects, your MEMORY.md, and your final 30-day build.
-            </p>
+            <>
+              <h1 className="ob-landing-title">Build your personal AI.<br />Tailored to your world.</h1>
+              <p className="ob-landing-desc">
+                This isn't a generic AI course. Tell us your industry, your role, and what you want to automate — and the course adapts: the examples, the projects, your MEMORY.md, and your final 30-day build.
+              </p>
+            </>
           )}
 
           <div className="ob-landing-tracks">
@@ -604,11 +617,14 @@ export default function Onboarding() {
           </div>
 
           <div className="ob-landing-industries">
-            {INDUSTRY_OPTIONS.slice(0, 6).map(ind => (
+            {INDUSTRY_OPTIONS.slice(0, 8).map(ind => (
               <div key={ind.id} className="ob-landing-industry-chip">
                 <span>{ind.icon}</span> {ind.label}
               </div>
             ))}
+            <div className="ob-landing-industry-chip">
+              <span>+</span> {INDUSTRY_OPTIONS.length - 8} more
+            </div>
           </div>
 
           <div className="ob-landing-promise">
@@ -619,7 +635,7 @@ export default function Onboarding() {
 
           <motion.button className="ob-landing-cta" onClick={handleNext}
             whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-            {isPreset ? `Review my profile →` : 'Build my custom course →'}
+            {isPreset ? 'Review my profile →' : 'Build my custom course →'}
           </motion.button>
           <p className="ob-landing-note">
             {isPreset ? 'Takes 2 minutes to review. Then generate your course.' : '5 minutes to set up. 30 days to transform how you work.'}
@@ -630,7 +646,7 @@ export default function Onboarding() {
   }
 
   // ── Form steps ────────────────────────────────────────────────────────────
-  const showTipsPanel = step >= 1 && step <= 3
+  const showTipsPanel = step >= 1 && step <= 4
 
   return (
     <div className="ob-page">
@@ -647,16 +663,16 @@ export default function Onboarding() {
             <motion.div key={step}
               initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
-              {step === 1 && <Step1 form={form} onChange={onChange} onFocus={onFocus} />}
-              {step === 2 && <Step2 form={form} onChange={onChange} onFocus={onFocus} />}
-              {step === 3 && <Step3 form={form} onChange={onChange} onFocus={onFocus} />}
-              {step === 4 && <Step4 form={form} onGenerated={handleGenerated} onSkip={handleSkipGeneration} />}
-              {step === 5 && <Step5 form={form} generatedContent={generatedContent} />}
+              {step === 1 && <StepIndustry form={form} onChange={onChange} onFocus={onFocus} />}
+              {step === 2 && <StepAboutYou form={form} onChange={onChange} onFocus={onFocus} />}
+              {step === 3 && <StepGoal form={form} onChange={onChange} onFocus={onFocus} />}
+              {step === 4 && <StepTools form={form} onChange={onChange} onFocus={onFocus} />}
+              {step === 5 && <StepGenerate form={form} onGenerated={handleGenerated} onSkip={handleSkipGeneration} />}
+              {step === 6 && <StepPreview form={form} generatedContent={generatedContent} />}
             </motion.div>
           </AnimatePresence>
 
-          {/* Show next button for steps 1-3 and 5 (not 4 — it has its own CTA) */}
-          {step !== 4 && (
+          {step !== 5 && (
             <div className="ob-form-footer">
               <motion.button
                 className={`ob-next-btn ${!canProceed() ? 'ob-next-btn--disabled' : ''}`}
