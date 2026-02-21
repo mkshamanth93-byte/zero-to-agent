@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useUserProfile, EMPTY_PROFILE } from '../hooks/useUserProfile'
@@ -302,13 +302,161 @@ function StepTools({ form, onChange, onFocus }) {
   )
 }
 
+// ─── Generation screen data ───────────────────────────────────────────────────
+const MODULE_SLOTS = [
+  { num: 0, label: 'Foundations', title: 'Environment Setup',        fixed: true },
+  { num: 1, label: 'Module 1',    title: 'Your First Python Agent',  fixed: true },
+  { num: 2, label: 'Module 2',    title: 'OpenClaw & AgentSkills',   fixed: true },
+  { num: 3, label: 'Module 3',    title: 'Research Agent',           fixed: false },
+  { num: 4, label: 'Module 4',    title: 'Knowledge Base & RAG',     fixed: false },
+  { num: 5, label: 'Module 5',    title: 'Data Analysis Agent',      fixed: false },
+  { num: 6, label: 'Module 6',    title: 'Prep & Briefing Agent',    fixed: false },
+  { num: 7, label: 'Module 7',    title: 'The Big Build',            fixed: false, isBig: true },
+  { num: 8, label: 'Module 8',    title: 'Full Orchestration',       fixed: true  },
+]
+
+const INSIGHTS = [
+  { stat: 'MEMORY.md',  body: 'Your agent reads this file before every conversation. The more specific it is, the smarter every interaction becomes — it\'s the difference between a generic AI and YOUR AI.' },
+  { stat: 'Module 7',   body: 'The biggest module. The one you\'ve been building toward. It connects everything — your actual software, your workflows, your decision points. You described it. We designed it.' },
+  { stat: 'LangGraph',  body: 'The agent framework you\'ll use in Modules 4–8. Unlike simple chains, LangGraph agents can backtrack, retry, and recover from mistakes — just like a human would.' },
+  { stat: 'OpenClaw',   body: 'Your agent platform runs entirely on your machine. No cloud costs, no data leaving your environment, no subscription. You own the whole stack.' },
+  { stat: '30 days',    body: 'Every module is designed to produce something working — not just knowledge. By Day 30 you\'ll have 5 deployed AI systems, not a certificate and a folder of notes.' },
+  { stat: 'ReAct Loop', body: 'The pattern your agents will use: Reason → Act → Observe → Reason again. It\'s how a good analyst thinks — your agent just does it 10x faster and never forgets.' },
+  { stat: 'Agents vs Automation', body: 'Most tools move data from A to B. Agents move decisions. They reason about what to do next, adapt when something unexpected happens, and know when to ask a human.' },
+  { stat: 'Human-in-the-loop', body: 'Great agents don\'t go rogue — they surface decisions. Your Module 7 build will have specific approval gates where you review before it acts. That\'s intentional design, not a limitation.' },
+]
+
+// ─── Animated generation screen ───────────────────────────────────────────────
+function GeneratingScreen({ generatedData, onDone }) {
+  const [revealedSlots, setRevealedSlots] = useState([])
+  const [insightIndex, setInsightIndex] = useState(0)
+  const [revealed, setRevealed] = useState(false)   // true = gen done, show real titles
+
+  useEffect(() => {
+    // Stagger module slots appearing — one every 480ms
+    MODULE_SLOTS.forEach((_, i) => {
+      setTimeout(() => setRevealedSlots(prev => [...prev, i]), i * 480 + 300)
+    })
+    // Rotate insights every 3.2s
+    const interval = setInterval(() => {
+      setInsightIndex(prev => (prev + 1) % INSIGHTS.length)
+    }, 3200)
+    return () => clearInterval(interval)
+  }, [])
+
+  // When generation completes, flash-reveal real titles then advance
+  useEffect(() => {
+    if (!generatedData) return
+    // Small delay so user sees the reveal before moving on
+    setTimeout(() => setRevealed(true), 300)
+    setTimeout(() => onDone(), 2200)
+  }, [generatedData])
+
+  const getModuleTitle = (slot) => {
+    if (!revealed || slot.fixed) return slot.title
+    if (slot.num === 7 && generatedData?.module7?.title) return generatedData.module7.title
+    if (slot.num === 3 && generatedData?.module3?.title) return generatedData.module3.title
+    if (slot.num === 4 && generatedData?.module4?.title) return generatedData.module4.title
+    if (slot.num === 5 && generatedData?.module5?.title) return generatedData.module5.title
+    if (slot.num === 6 && generatedData?.module6?.title) return generatedData.module6.title
+    return slot.title
+  }
+
+  return (
+    <div className="ob-gen-screen">
+      {/* Header */}
+      <motion.div className="ob-gen-screen-header"
+        initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="ob-gen-screen-eyebrow">
+          {revealed
+            ? <><span className="ob-gen-eyebrow-dot ob-gen-eyebrow-dot--done">✓</span> Course ready</>
+            : <><span className="ob-gen-eyebrow-dot ob-gen-eyebrow-dot--pulse" />  Designing your course</>
+          }
+        </div>
+        <h2 className="ob-gen-screen-title">
+          {revealed ? 'Your course is built.' : 'Building your 30-day programme…'}
+        </h2>
+      </motion.div>
+
+      {/* Module grid */}
+      <div className="ob-gen-modules-grid">
+        {MODULE_SLOTS.map((slot, i) => {
+          const isVisible = revealedSlots.includes(i)
+          const isRevealed = revealed && !slot.fixed
+          const realTitle = getModuleTitle(slot)
+          return (
+            <motion.div
+              key={slot.num}
+              className={`ob-gen-module-slot ${slot.isBig ? 'ob-gen-module-slot--big' : ''} ${isRevealed ? 'ob-gen-module-slot--revealed' : ''} ${slot.fixed ? 'ob-gen-module-slot--fixed' : ''}`}
+              initial={{ opacity: 0, scale: 0.92, y: 12 }}
+              animate={isVisible ? { opacity: 1, scale: 1, y: 0 } : { opacity: 0, scale: 0.92, y: 12 }}
+              transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
+              <div className="ob-gen-module-num">M{slot.num}</div>
+              <div className="ob-gen-module-content">
+                {isRevealed
+                  ? <motion.div className="ob-gen-module-real-title"
+                      initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4 }}>
+                      {realTitle}
+                    </motion.div>
+                  : isVisible
+                    ? <div className={`ob-gen-module-building ${slot.fixed ? 'ob-gen-module-building--fixed' : ''}`}>
+                        {slot.fixed
+                          ? <span className="ob-gen-module-fixed-title">{slot.title}</span>
+                          : <><span className="ob-gen-shimmer-bar" /><span className="ob-gen-shimmer-bar ob-gen-shimmer-bar--short" /></>
+                        }
+                      </div>
+                    : null
+                }
+              </div>
+              {isVisible && slot.fixed && (
+                <div className="ob-gen-module-check">✓</div>
+              )}
+              {isVisible && !slot.fixed && !revealed && (
+                <div className="ob-gen-module-pulse">
+                  <span className="ob-gen-pulse-dot" />
+                </div>
+              )}
+              {isRevealed && (
+                <div className="ob-gen-module-check ob-gen-module-check--reveal">✦</div>
+              )}
+            </motion.div>
+          )
+        })}
+      </div>
+
+      {/* Insight carousel */}
+      <div className="ob-gen-insight-wrap">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={insightIndex}
+            className="ob-gen-insight"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="ob-gen-insight-stat">{INSIGHTS[insightIndex].stat}</div>
+            <div className="ob-gen-insight-body">{INSIGHTS[insightIndex].body}</div>
+          </motion.div>
+        </AnimatePresence>
+        <div className="ob-gen-insight-dots">
+          {INSIGHTS.map((_, i) => (
+            <div key={i} className={`ob-gen-insight-dot ${i === insightIndex ? 'ob-gen-insight-dot--active' : ''}`} />
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Step 5: Generate ─────────────────────────────────────────────────────────
 function StepGenerate({ form, onGenerated, onSkip }) {
   const [apiKey, setApiKey] = useState('')
-  const [status, setStatus] = useState('idle')
+  const [status, setStatus] = useState('idle')  // idle | generating | done | error
   const [error, setError] = useState('')
-  const [currentStage, setCurrentStage] = useState(null)
-  const [completedStages, setCompletedStages] = useState([])
+  const [generatedData, setGeneratedData] = useState(null)
 
   const handleGenerate = async () => {
     if (!apiKey.trim().startsWith('sk-')) {
@@ -317,58 +465,47 @@ function StepGenerate({ form, onGenerated, onSkip }) {
     }
     setError('')
     setStatus('generating')
-    setCompletedStages([])
 
     try {
-      let stageIndex = 0
-      const advanceStage = () => {
-        if (stageIndex < GENERATION_STAGES.length) {
-          const stage = GENERATION_STAGES[stageIndex]
-          setCurrentStage(stage.id)
-          stageIndex++
-          setTimeout(() => {
-            setCompletedStages(prev => [...prev, stage.id])
-            advanceStage()
-          }, stage.duration)
-        }
-      }
-      advanceStage()
-
-      const generated = await generateWithLLM(apiKey.trim(), form, (stageId) => {
-        setCurrentStage(stageId)
-      })
-
+      const generated = await generateWithLLM(apiKey.trim(), form)
+      setGeneratedData(generated)
       setStatus('done')
-      setTimeout(() => onGenerated(generated), 600)
+      // onGenerated is called by GeneratingScreen after the reveal animation
     } catch (err) {
       setStatus('error')
       setError(err.message || 'Something went wrong. Try again.')
     }
   }
 
-  return (
-    <div className="ob-step">
-      <div className="ob-step-heading">
-        <h2>Generate your personalised course.</h2>
-        <p>One API call writes your MEMORY.md, designs your Module 7 project, and tailors every module to your world.</p>
-      </div>
+  // Once generating screen signals done (after reveal), advance
+  const handleScreenDone = () => onGenerated(generatedData)
 
-      {status === 'idle' || status === 'error' ? (
-        <>
+  return (
+    <>
+      {(status === 'generating' || status === 'done') ? (
+        <GeneratingScreen
+          generatedData={status === 'done' ? generatedData : null}
+          onDone={handleScreenDone}
+        />
+      ) : (
+        <div className="ob-step">
+          <div className="ob-step-heading">
+            <h2>Generate your personalised course.</h2>
+            <p>One API call writes your MEMORY.md, designs your Module 7 project, and tailors every module to your world.</p>
+          </div>
+
           <div className="ob-generate-card">
-            <div className="ob-generate-what">
-              <div className="ob-generate-what-label">What gets generated:</div>
-              {[
-                'Your MEMORY.md — pre-filled with your role, tools, and context',
-                'Your Module 7 project brief — specific to your actual software',
-                'Tailored use cases for modules 3, 4, 5, 6',
-                'A Day 1 message written for your specific situation',
-              ].map((item, i) => (
-                <div key={i} className="ob-generate-item">
-                  <span className="ob-generate-item-dot">✦</span> {item}
-                </div>
-              ))}
-            </div>
+            <div className="ob-generate-what-label">What gets generated:</div>
+            {[
+              'Your MEMORY.md — pre-filled with your role, tools, and context',
+              'Your Module 7 project brief — specific to your actual software',
+              'Tailored titles and briefs for modules 3, 4, 5, 6',
+              'A Day 1 message written for your specific situation',
+            ].map((item, i) => (
+              <div key={i} className="ob-generate-item">
+                <span className="ob-generate-item-dot">✦</span> {item}
+              </div>
+            ))}
             <div className="ob-generate-cost">~$0.002 · one call · key never stored</div>
           </div>
 
@@ -403,37 +540,9 @@ function StepGenerate({ form, onGenerated, onSkip }) {
               Skip — use template content instead
             </button>
           </div>
-        </>
-      ) : (
-        <div className="ob-generating">
-          <div className="ob-generating-stages">
-            {GENERATION_STAGES.map((stage) => {
-              const isDone = completedStages.includes(stage.id)
-              const isActive = currentStage === stage.id && !isDone
-              return (
-                <motion.div
-                  key={stage.id}
-                  className={`ob-gen-stage ${isDone ? 'ob-gen-stage--done' : ''} ${isActive ? 'ob-gen-stage--active' : ''}`}
-                  initial={{ opacity: 0, x: -8 }}
-                  animate={{ opacity: isDone || isActive ? 1 : 0.3, x: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <span className="ob-gen-stage-icon">
-                    {isDone ? '✓' : isActive ? <span className="ob-gen-spinner">◌</span> : '○'}
-                  </span>
-                  <span className="ob-gen-stage-label">{stage.label}</span>
-                </motion.div>
-              )
-            })}
-          </div>
-          {status === 'done' && (
-            <motion.div className="ob-gen-done" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-              Course generated. Opening preview...
-            </motion.div>
-          )}
         </div>
       )}
-    </div>
+    </>
   )
 }
 
