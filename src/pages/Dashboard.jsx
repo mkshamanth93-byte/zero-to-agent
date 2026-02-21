@@ -3,6 +3,8 @@ import { motion } from 'framer-motion'
 import { MODULES } from '../data/modules'
 import { wisdomQuotes, encouragements } from '../data/wisdom'
 import { useProgress } from '../hooks/useProgress'
+import { useUserProfile } from '../hooks/useUserProfile'
+import { generateCourseProfile, getAdaptiveModuleOverrides } from '../utils/generateCourse'
 import WisdomCard from '../components/WisdomCard'
 
 function XPBar({ xp, max = 3000 }) {
@@ -24,6 +26,7 @@ function XPBar({ xp, max = 3000 }) {
 
 export default function Dashboard() {
   const navigate = useNavigate()
+  const { profile, clearProfile } = useUserProfile()
   const {
     progress,
     isModuleDone,
@@ -39,10 +42,16 @@ export default function Dashboard() {
 
   const encouragement = [...encouragements].reverse().find(e => totalCheckpoints >= e.threshold)
 
-  const lastCompletedModule = MODULES.slice().reverse().find(m => isModuleDone(m.id))
   const nextModule = MODULES.find(m => !isModuleDone(m.id))
 
-  const quoteOfDay = wisdomQuotes[new Date().getDate() % wisdomQuotes.length]
+  // Personalised course data from profile
+  const courseData = profile ? generateCourseProfile(profile) : null
+  const moduleOverrides = profile ? getAdaptiveModuleOverrides(profile) : {}
+
+  const courseTitle = courseData?.courseTitle || 'Agentic AI Engineer Playbook'
+  const eyebrow = courseData?.eyebrow || 'Deekshita\'s 30-Day Build Programme'
+  const subtitle = courseData?.subtitle || '9 modules · 30 days · 5 working AI systems · 1 job application engine'
+  const industryColor = courseData?.industryColor || '#6366f1'
 
   return (
     <div className="dashboard">
@@ -56,15 +65,16 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            Deekshita's 30-Day Build Programme
+            {eyebrow}
           </motion.div>
           <motion.h1
             className="dashboard-title"
+            style={{ '--title-accent': industryColor }}
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            Agentic AI Engineer Playbook
+            {courseTitle}
           </motion.h1>
           <motion.p
             className="dashboard-subtitle"
@@ -72,7 +82,7 @@ export default function Dashboard() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
           >
-            9 modules · 30 days · 5 working AI systems · 1 job application engine
+            {subtitle}
           </motion.p>
 
           {/* Stats row */}
@@ -213,6 +223,17 @@ export default function Dashboard() {
         <div className="dashboard-footer-note">
           <p>This course is self-paced. There are no deadlines except the ones you set for yourself.</p>
           <p>Every module builds on the previous. Don't skip.</p>
+          {profile && (
+            <p className="dashboard-profile-tag">
+              <span style={{ color: industryColor }}>
+                {courseData?.industryIcon} {courseData?.template?.label}
+              </span>
+              {' · '}
+              <button className="dashboard-reset-btn" onClick={() => { clearProfile(); navigate('/onboarding') }}>
+                Change profile
+              </button>
+            </p>
+          )}
         </div>
       </div>
     </div>
