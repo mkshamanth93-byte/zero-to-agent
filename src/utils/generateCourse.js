@@ -3,11 +3,13 @@ import { INDUSTRY_TEMPLATES } from '../data/industryTemplates'
 /**
  * Takes a completed user profile from onboarding and returns
  * all the personalised strings used throughout the course UI.
+ * If profile.generatedContent exists (from LLM), it takes precedence over templates.
  */
 export function generateCourseProfile(profile) {
   const template = INDUSTRY_TEMPLATES[profile.industry] || INDUSTRY_TEMPLATES['tech-career']
   const name = profile.name || 'You'
   const firstName = name.split(' ')[0]
+  const gen = profile.generatedContent || null   // LLM-generated content (may be null)
 
   // Course title — adapts to goal track
   const courseTitleMap = {
@@ -36,38 +38,55 @@ export function generateCourseProfile(profile) {
   }
   const welcomeMessage = welcomeMap[profile.goalTrack] || 'Let\'s build.'
 
-  // Module 7 (the big automation build) — personalised title and subtitle
-  const module7 = {
-    title: profile.goalTrack === 'project'
-      ? 'Your Custom System Build'
-      : template.module7Goal.split(' — ')[0],
-    subtitle: profile.goalTrack === 'project'
-      ? shortenProjectDesc(profile.projectDescription)
-      : template.module7Goal.split(' — ')[1] || template.module7Goal,
-    description: profile.goalTrack === 'project'
-      ? `Your specific project: ${profile.projectDescription || 'described in detail in your profile'}.`
-      : template.module7Goal,
-  }
+  // Module 7 — LLM-generated takes priority over template
+  const module7 = gen?.module7
+    ? {
+        title: gen.module7.title,
+        subtitle: gen.module7.subtitle,
+        description: gen.module7.fullBrief,
+        keyIntegrations: gen.module7.keyIntegrations || [],
+        humanApprovalPoints: gen.module7.humanApprovalPoints || [],
+      }
+    : {
+        title: profile.goalTrack === 'project'
+          ? 'Your Custom System Build'
+          : template.module7Goal.split(' — ')[0],
+        subtitle: profile.goalTrack === 'project'
+          ? shortenProjectDesc(profile.projectDescription)
+          : template.module7Goal.split(' — ')[1] || template.module7Goal,
+        description: profile.goalTrack === 'project'
+          ? `Your specific project: ${profile.projectDescription || 'described in detail in your profile'}.`
+          : template.module7Goal,
+      }
 
   // Module 8 capstone
-  const module8 = {
-    title: profile.goalTrack === 'project'
-      ? 'Orchestration & Launch'
-      : template.module8Capstone.split(' — ')[0] || template.module8Capstone,
-    subtitle: 'Connect all the pieces. Deploy the orchestrator. Go live.',
-  }
+  const module8 = gen?.module8
+    ? { title: gen.module8.capstoneTitle, subtitle: gen.module8.capstoneDescription }
+    : {
+        title: profile.goalTrack === 'project'
+          ? 'Orchestration & Launch'
+          : template.module8Capstone.split(' — ')[0] || template.module8Capstone,
+        subtitle: 'Connect all the pieces. Deploy the orchestrator. Go live.',
+      }
 
-  // MEMORY.md template — what they should write about themselves
+  // MEMORY.md — full draft from LLM, or guide from template
   const memoryMdGuide = buildMemoryMdGuide(profile, template)
+  const memoryMdDraft = gen?.memoryMdDraft || null   // ready-to-use if generated
 
-  // Use case examples for the dashboard preview
-  const useCases = template.useCases
+  // Use cases — LLM-generated are more specific
+  const useCases = gen?.useCases?.length ? gen.useCases : template.useCases
 
-  // Key projects they'll build (shown on confirmation screen)
-  const keyProjects = buildKeyProjects(profile, template)
+  // Key projects they'll build
+  const keyProjects = gen?.keyProjects?.length
+    ? gen.keyProjects
+    : buildKeyProjects(profile, template)
 
-  // The "what is your agent doing right now" tagline shown on dashboard
-  const agentTagline = buildAgentTagline(profile, template)
+  // Tagline — from LLM or template
+  const agentTagline = gen?.courseTagline || buildAgentTagline(profile, template)
+
+  // Day 1 message
+  const day1Message = gen?.day1Message || null
+  const whyThisMatters = gen?.whyThisMatters || template.whyThisMatters || null
 
   return {
     courseTitle,
@@ -77,9 +96,13 @@ export function generateCourseProfile(profile) {
     module7,
     module8,
     memoryMdGuide,
+    memoryMdDraft,
     useCases,
     keyProjects,
     agentTagline,
+    day1Message,
+    whyThisMatters,
+    isLLMGenerated: Boolean(gen),
     template,
     industryColor: template.color,
     industryIcon: template.icon,
@@ -135,31 +158,45 @@ function buildMemoryMdGuide(profile, template) {
  */
 export function getAdaptiveModuleOverrides(profile) {
   const template = INDUSTRY_TEMPLATES[profile.industry] || INDUSTRY_TEMPLATES['tech-career']
+  const gen = profile.generatedContent || null
 
   return {
     3: {
-      subtitle: template.module3ExampleProject
+      title: gen?.module3?.title,
+      subtitle: gen?.module3?.subtitle || (template.module3ExampleProject
         ? `Build a research agent for ${template.label.toLowerCase()} intelligence.`
-        : 'Build a research agent that searches deeper than any human would.',
-      exampleProject: template.module3ExampleProject,
+        : 'Build a research agent that searches deeper than any human would.'),
+      exampleProject: gen?.module3?.projectBrief || template.module3ExampleProject,
     },
     4: {
-      subtitle: template.module4ExampleProject
+      title: gen?.module4?.title,
+      subtitle: gen?.module4?.subtitle || (template.module4ExampleProject
         ? `Build a knowledge base from your ${template.label.toLowerCase()} domain.`
-        : 'Build a RAG agent that knows everything about your work.',
-      exampleProject: template.module4ExampleProject,
+        : 'Build a RAG agent that knows everything about your work.'),
+      exampleProject: gen?.module4?.projectBrief || template.module4ExampleProject,
     },
     5: {
-      exampleProject: template.module5ExampleProject,
+      title: gen?.module5?.title,
+      subtitle: gen?.module5?.subtitle,
+      exampleProject: gen?.module5?.projectBrief || template.module5ExampleProject,
+    },
+    6: {
+      title: gen?.module6?.title,
+      subtitle: gen?.module6?.subtitle,
+      exampleProject: gen?.module6?.projectBrief,
     },
     7: {
-      title: profile.goalTrack === 'project' ? 'Your Custom System Build' : undefined,
-      subtitle: profile.goalTrack === 'project'
+      title: gen?.module7?.title || (profile.goalTrack === 'project' ? 'Your Custom System Build' : undefined),
+      subtitle: gen?.module7?.subtitle || (profile.goalTrack === 'project'
         ? shortenProjectDesc(profile.projectDescription)
-        : template.module7Goal,
+        : template.module7Goal),
+      fullBrief: gen?.module7?.fullBrief,
+      keyIntegrations: gen?.module7?.keyIntegrations,
+      humanApprovalPoints: gen?.module7?.humanApprovalPoints,
     },
     8: {
-      subtitle: 'Connect all agents. Build the orchestrator. Deploy.',
+      title: gen?.module8?.capstoneTitle,
+      subtitle: gen?.module8?.capstoneDescription || 'Connect all agents. Build the orchestrator. Deploy.',
     },
   }
 }

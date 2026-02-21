@@ -34,8 +34,12 @@ export function useUserProfile() {
     }
   })
 
-  const saveProfile = useCallback((profileData) => {
-    const complete = { ...profileData, completedAt: new Date().toISOString() }
+  const saveProfile = useCallback((profileData, generatedContent = null) => {
+    const complete = {
+      ...profileData,
+      completedAt: new Date().toISOString(),
+      generatedContent: generatedContent || null,
+    }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(complete))
     setProfile(complete)
   }, [])
