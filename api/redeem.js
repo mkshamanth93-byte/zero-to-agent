@@ -10,7 +10,12 @@
  *   token:{UUID}    -> JSON string { email, coupon, createdAt }
  */
 
-import { kv } from '@vercel/kv'
+import { Redis } from '@upstash/redis'
+
+const kv = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+})
 import { randomUUID } from 'crypto'
 
 export default async function handler(req, res) {
