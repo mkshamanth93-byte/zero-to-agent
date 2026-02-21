@@ -80,6 +80,154 @@ The second approach handles questions you never anticipated. It adapts.`,
       },
       { type: 'diagram', id: 'agent-anatomy' },
       {
+        type: 'callout',
+        variant: 'welcome',
+        title: 'Before we write code — let\'s understand the infrastructure.',
+        text: 'You\'re about to see OpenClaw when you install it. It has 50+ skills listed. It\'ll look like a lot. Before you touch any of it, you need the mental model. Read the next section carefully — everything in this course sits on top of it.',
+      },
+      {
+        type: 'text',
+        markdown: `## OpenClaw — The Full Mental Model
+
+### The Problem Without OpenClaw
+
+When you build an agent in Python (Module 1), it lives in a terminal window. To use it, you:
+1. Open your laptop → navigate to the folder → run \`python agent.py\` → type your question → wait → close terminal.
+
+That's not a personal AI assistant. That's a script with extra steps.
+
+For an agent to be useful in daily life, it needs to be **always on**, **accessible from anywhere**, and **aware of who it's working for**.
+
+That's exactly what OpenClaw solves.`,
+      },
+      {
+        type: 'callout',
+        variant: 'aha',
+        title: '⚡ Mental Model: The Smart Home Hub',
+        text: 'Think of Philips Hue. The hub doesn\'t produce light — it orchestrates all your smart bulbs. It knows what\'s connected, routes commands to the right device, and remembers your scenes. OpenClaw is that hub, but for AI agents. The LLMs and skills are the bulbs. You are the designer of the scenes.',
+      },
+      { type: 'diagram', id: 'openclaw-hub' },
+      {
+        type: 'text',
+        markdown: `## What OpenClaw Actually Is
+
+\`\`\`
+                    ┌──────────────────────────────────────┐
+                    │         OPENCLAW PROCESS             │
+                    │  (running on your Mac, always on)    │
+                    │                                      │
+  Your Phone ──────►│  GATEWAY                             │
+  (Telegram)        │  Routes messages, manages sessions   │
+                    │           │                          │
+                    │           ▼                          │
+                    │  AGENT RUNTIME                       │
+                    │  Loads MEMORY.md → calls LLM →       │
+                    │  executes skills → returns response  │
+                    │           │                          │
+                    │           ▼                          │
+                    │  YOUR AGENTSKILLS (your code)        │
+                    │  [github-profile.ts]                 │
+                    │  [job-scorer.ts]                     │
+                    │  [linkedin-apply.ts]                 │
+                    └──────────────────────────────────────┘
+                               │
+                               ▼
+                    OpenAI API (only your API key sent)
+                    GitHub API, LinkedIn, etc.
+\`\`\`
+
+**Your Mac becomes a server.** When you send "Find me jobs" from Telegram in a coffee shop, your message goes to Telegram's servers → forwarded to OpenClaw running on your Mac → agent reasons and calls skills → answer goes back to your phone. No cloud subscription. No monthly fee. No data going to a third party.`,
+      },
+      {
+        type: 'text',
+        markdown: `## Three Things You Control (Most AI Products Lock Two Away)
+
+| What | ChatGPT | OpenAI API | OpenClaw |
+|------|---------|-----------|----------|
+| Which LLM | ✗ OpenAI only | ✗ | ✓ GPT, Claude, Llama, Gemini |
+| What agent knows about you | ✗ cleared on logout | Partial | ✓ MEMORY.md — you own it |
+| What tools it can use | ✗ predefined | Partial | ✓ build any AgentSkill |
+
+OpenClaw gives you full control of all three. **You are the architect.**`,
+      },
+      {
+        type: 'callout',
+        variant: 'tip',
+        title: '💡 The Most Important File: MEMORY.md',
+        text: 'One file makes your OpenClaw agent smart about you: ~/.openclaw/workspaces/default/MEMORY.md — a plain markdown file you write. Every request, the agent reads it first. Career goals, job preferences, skills, deal-breakers, communication style. A good MEMORY.md turns a generic AI assistant into one that knows you\'re a Data Scientist who won\'t relocate and only wants agentic AI roles. You\'ll write yours in Module 2.',
+      },
+      {
+        type: 'text',
+        markdown: `## AgentSkills — Apps for Your Agent
+
+When you install OpenClaw, you'll see 50+ built-in skills. Don't be overwhelmed. Here's how to think about them:
+
+\`\`\`
+┌─────────────────────────────────────────────────────────┐
+│         BUILT-IN AGENTSKILLS (already there)            │
+│                                                         │
+│  PRODUCTIVITY         DATA & RESEARCH                   │
+│  • Google Calendar    • Web search (DuckDuckGo)         │
+│  • Gmail read/send    • URL reader / scraper            │
+│  • Notion pages       • Wikipedia lookup                │
+│  • Todoist tasks      • GitHub repos                    │
+│                       • Weather                         │
+│  FILES & SYSTEM                                         │
+│  • Read/write files   MEMORY                            │
+│  • Run shell cmds     • Save notes to MEMORY.md         │
+│  • List directories   • Daily memory log                │
+│  • Screenshots        • Search past memories            │
+└─────────────────────────────────────────────────────────┘
+\`\`\`
+
+**You install them like apps.** Enable in config.json. Done — your agent can now do that thing.
+
+**Custom AgentSkills are what you BUILD.** TypeScript files you write. Job scorer. LinkedIn scraper. Cover letter writer. Portfolio reader. That's what this course teaches.
+
+The four types of extensions you can build:
+
+| Type | What It Does | When You'd Build One |
+|------|-------------|---------------------|
+| **AgentSkill (Tool)** | Adds a new capability the LLM can call | LinkedIn scraper, job scorer |
+| **Memory** | Swaps out how the agent stores things | Replace SQLite with Postgres |
+| **Provider** | Adds a new LLM | Self-hosted Ollama, company LLM |
+| **Channel** | Adds a new messaging platform | Custom internal chat tool |
+
+For this course, you'll build **AgentSkills (Tools)**. Everything else is covered by what OpenClaw ships with.`,
+      },
+      {
+        type: 'callout',
+        variant: 'wisdom',
+        title: '🔮 Why This Matters For Your Career',
+        text: 'The companies hiring for agentic AI roles are building exactly this kind of infrastructure — LLMs with tools, connected to real systems, aware of business context. You\'re not just learning to use OpenClaw. You\'re learning the pattern: agent + memory + skills + orchestration. Every serious agentic AI stack is a variation of this.',
+      },
+      {
+        type: 'text',
+        markdown: `## What You'll Have Built by Day 30
+
+\`\`\`
+Your Phone
+    │ "Find me senior DS jobs, prep me for Stripe"
+    ▼
+OpenClaw (your Mac)
+    │
+    ├── MEMORY.md — knows your profile, preferences, deal-breakers
+    ├── Skill: job-finder      → scrapes LinkedIn for matching roles
+    ├── Skill: job-scorer      → evaluates fit 1-10 against your profile
+    ├── Skill: cover-letter    → writes tailored application
+    ├── Skill: company-research → researches the company
+    ├── Skill: interview-prep  → STAR answers from your portfolio
+    └── Skill: tracker         → logs everything to Google Sheets
+    │
+    │ "Found 3 matches. Stripe: 9/10.
+    │  Cover letter ready. Apply? YES / SKIP"
+    ▼
+You approve from your phone → Application submitted.
+\`\`\`
+
+**This is where you're going. Every module builds one more piece of this system.**`,
+      },
+      {
         type: 'text',
         markdown: `## Environment Setup
 
@@ -128,8 +276,10 @@ Before you write any agent code, your environment needs to be ready. Do this onc
           { id: 'm0-c2', text: 'Virtual environment created and activated — you see `(venv)` in your terminal' },
           { id: 'm0-c3', text: 'All packages installed without errors' },
           { id: 'm0-c4', text: '`verify_setup.py` runs and prints "Setup complete!"' },
-          { id: 'm0-c5', text: 'You can explain in one sentence what a "tool" is in agent context' },
-          { id: 'm0-c6', text: 'You understand the difference between an agent and a script' },
+          { id: 'm0-c5', text: 'You can explain what a "tool" is in agent context (one sentence)' },
+          { id: 'm0-c6', text: 'You understand why OpenClaw is "self-hosted" and why that matters' },
+          { id: 'm0-c7', text: 'You can explain what MEMORY.md is and why it makes an agent smart' },
+          { id: 'm0-c8', text: 'You can draw (roughly) the OpenClaw hub-and-spoke architecture' },
         ],
       },
     ],
@@ -246,30 +396,31 @@ Your agent currently forgets everything when you restart it. Let's fix that.`,
     id: 2,
     slug: 'openclaw',
     emoji: '🔗',
-    title: 'OpenClaw & Your First AgentSkill',
-    subtitle: 'Your agent moves from terminal to your phone.',
-    days: '6–8',
-    xp: 300,
+    title: 'OpenClaw: Install, Orient & Build',
+    subtitle: 'From terminal script to 24/7 phone assistant in 4 days.',
+    days: '6–9',
+    xp: 350,
     color: '#06b6d4',
     outcomes: [
       'OpenClaw running on your Mac, connected to Telegram',
-      'Your MEMORY.md filled with personal context',
-      'First custom AgentSkill deployed',
-      'Able to talk to your agent from your phone',
+      'Built-in skills activated — web search, memory, file access',
+      'MEMORY.md filled in with your real career context',
+      'Three custom AgentSkills built and deployed',
+      'Can build new skills in under 20 minutes going forward',
     ],
     sections: [
       {
         type: 'callout',
         variant: 'welcome',
-        title: 'This module changes the game.',
-        text: 'Right now your agent lives in a terminal. After this module, it lives on your phone. You can message it from bed, from a coffee shop, from a job interview waiting room. OpenClaw is the infrastructure that makes your agent a 24/7 assistant.',
+        title: 'This module changes what "assistant" means.',
+        text: 'Right now your agent lives in a terminal. After this module, it lives on your phone. You\'ll message it from anywhere — and it\'ll respond with real information about your own life. You\'ll also see ~50 built-in skills when you open OpenClaw. Don\'t be overwhelmed. This module is your full orientation.',
       },
       { type: 'diagram', id: 'openclaw-arch' },
       {
         type: 'text',
-        markdown: `## Day 6: Install OpenClaw
+        markdown: `## Day 6: Install & Connect
 
-OpenClaw is a **self-hosted** AI agent platform. It runs on your Mac, not in the cloud. Your data never leaves your machine unless you explicitly send it somewhere.`,
+OpenClaw is a **self-hosted** AI agent platform. It runs on your Mac, not in the cloud. Your data never leaves your machine unless you explicitly call an external API.`,
       },
       {
         type: 'step',
@@ -278,75 +429,176 @@ OpenClaw is a **self-hosted** AI agent platform. It runs on your Mac, not in the
         code: { language: 'bash', content: `git clone https://github.com/openclaw/openclaw.git ~/openclaw\ncd ~/openclaw\nnpm install -g pnpm\npnpm install\npnpm start setup` },
       },
       {
+        type: 'text',
+        markdown: `The setup wizard asks 4 things:
+
+| Question | What to Enter |
+|----------|--------------|
+| Which messaging platform? | **Telegram** (easiest, free) |
+| Which LLM provider? | **OpenAI** → paste your API key |
+| Where to store workspace? | Press Enter (accept \`~/.openclaw/\`) |
+| Create default workspace? | **Yes** |`,
+      },
+      {
         type: 'step',
         number: 2,
-        title: 'Get a Telegram bot token',
-        code: { language: 'bash', content: `# On your phone:\n# 1. Open Telegram → search @BotFather\n# 2. Send: /newbot\n# 3. Name it: DeekshitaAgent\n# 4. BotFather sends you a token like: 7234567890:AAF...\n# 5. Copy it — enter it when OpenClaw setup asks` },
+        title: 'Create your Telegram bot (60 seconds)',
+        code: { language: 'bash', content: `# On your phone:\n# 1. Open Telegram → search @BotFather → open it\n# 2. Send: /newbot\n# 3. Name: DeekshitaAgent\n# 4. Username: deekshita_agent_bot (add numbers if taken)\n# 5. BotFather sends a token: 7234567890:AAFxxxxxx...\n# 6. Copy it — you'll need it in the next step` },
+      },
+      {
+        type: 'cursor-prompt',
+        label: 'Configure OpenClaw',
+        description: 'Open ~/.openclaw/config.json in Cursor:',
+        prompt: 'Show me how to configure ~/.openclaw/config.json with: (1) Telegram channel enabled with my bot token [PASTE TOKEN HERE], (2) OpenAI provider with gpt-4o model, (3) these built-in skills enabled: web-search, url-reader, memory-write, memory-read, read-file, run-python. Show me the complete config.json structure.',
       },
       {
         type: 'step',
         number: 3,
-        title: 'Start OpenClaw',
-        code: { language: 'bash', content: `cd ~/openclaw\npnpm dev\n\n# You should see:\n# ✓ Gateway running on ws://127.0.0.1:18789\n# ✓ Telegram connected  \n# ✓ Agent ready\n\n# Open Telegram → find your bot → send: Hello` },
+        title: 'Start OpenClaw and test it',
+        code: { language: 'bash', content: `cd ~/openclaw\npnpm dev\n\n# You should see:\n# ✓ Gateway running on ws://127.0.0.1:18789\n# ✓ Telegram channel connected\n# ✓ Agent Runtime ready\n# ✓ Loaded 6 skills\n\n# Open Telegram → find your bot → send: Hello` },
       },
       {
         type: 'callout',
         variant: 'aha',
         title: '⚡ You Just Did Something Real',
-        text: 'You are now talking to an AI running on your own Mac from your phone. No cloud subscription. No data leaving your machine to a third-party service. This is self-hosted AI. This is what "infrastructure" means in the agentic world.',
+        text: 'You are now talking to an AI running on your own Mac from your phone. No cloud subscription. No data going to a third-party service. This is self-hosted AI. This is what the agentic AI industry actually runs on.',
       },
       {
         type: 'text',
-        markdown: `## Your MEMORY.md — The Most Important File
+        markdown: `## Orienting Yourself: The 50+ Built-In Skills
 
-This file is what your agent reads to know who it's working for. The more detail you put in, the smarter every agent becomes.`,
+When you first look at OpenClaw, you'll see many skills listed. Here's how to think about them:
+
+- **Most are disabled by default** — you turn them on in config.json
+- **You don't need all of them** — activate only what you'll use
+- **They're like apps** — install when needed, ignore the rest
+
+**Skills worth activating RIGHT NOW:**
+
+| Skill | Why |
+|-------|-----|
+| \`web-search\` | Every agent you build will search the web |
+| \`url-reader\` | Reading job postings, company pages |
+| \`memory-write\` | Agent can save notes between conversations |
+| \`memory-read\` | Agent can recall what it saved |
+| \`read-file\` | Reading your MEMORY.md, local documents |
+| \`run-python\` | Executing data processing on demand |
+
+**Save these for when you need them:**
+- Google Calendar — set up in Module 7 (needs OAuth)
+- Slack, Email — set up with the job application workflow
+- Code execution shells — set up in Module 5
+
+> 💡 **The key insight:** You didn't write a single line of code to get web search. You edited a config. That's the power of the skill system — common capabilities are pre-built. You only write custom skills for things specific to you.`,
+      },
+      {
+        type: 'step',
+        number: 4,
+        title: 'Test the built-in skills in Telegram',
+        code: { language: 'bash', content: `# Send these to your bot in Telegram:\n\n"Search the web for: agentic AI engineer jobs in London 2026"\n# → Should perform a real DuckDuckGo search\n\n"What is LangGraph? Give me a 3-sentence summary"\n# → Should search and summarise\n\n"Remember: Today I started the zero-to-agent course"\n# → Should save to memory\n\n"What did I note recently?"\n# → Should recall what it just saved` },
+      },
+      {
+        type: 'text',
+        markdown: `## Day 7: Writing Your MEMORY.md
+
+This is the most important thing you'll do this module. **Everything your agent does draws from this file.** The more specific you are, the smarter every interaction becomes.`,
       },
       {
         type: 'cursor-prompt',
         label: 'Build Your MEMORY.md',
-        description: 'Open ~/.openclaw/workspaces/default/MEMORY.md in Cursor. Use this prompt:',
-        prompt: 'Write a comprehensive MEMORY.md for my OpenClaw agent. Include these sections:\n\n**IDENTITY**: Name Deekshita Sridhar, Data Scientist & Agentic AI Engineer, location, LinkedIn URL\n\n**CAREER_GOALS**: Actively seeking roles in agentic AI and data science, preference for remote/hybrid, interested in companies using LLMs in production\n\n**TECHNICAL_PROFILE**: Full skills list — Python, LangChain, LangGraph, AutoGen, CrewAI, OpenClaw, scikit-learn, TensorFlow, PyTorch, SQL, PySpark, Tableau, Power BI\n\n**JOB_SEARCH_PROFILE** (as YAML): target_roles, must_have requirements, deal_breakers, nice_to_have, target_salary, locations, company_size\n\n**COMMUNICATION_STYLE**: Direct, concise, no fluff. Flag important items. Ask clarifying questions when ambiguous.\n\nFormat as clean markdown. Add placeholder comments where I should fill in real values.',
+        description: 'Open ~/.openclaw/workspaces/default/MEMORY.md in Cursor:',
+        prompt: 'Write a comprehensive MEMORY.md for my OpenClaw personal AI agent. This file is read before every conversation — it must contain everything the agent needs to help me effectively.\n\nSections to include:\n\n**1. Identity** — Name: Deekshita Sridhar, Data Scientist & Agentic AI Engineer, GitHub: dsridhar2110\n\n**2. Career Status** — Currently job hunting. Target: Senior DS or ML Engineer with agentic AI components. Remote-first or hybrid. Open to contract or permanent.\n\n**3. Job Preferences (be very specific):**\n- Must-haves (e.g. agentic AI in tech stack, Python-first, remote-first culture)\n- Deal-breakers (no pure banking/insurance, no BI-only roles, no relocation)\n- Salary: [my minimum — non-negotiable]\n- Target industries: tech, fintech, healthtech, AI-native startups\n\n**4. Technical Skills** — Group by: core strengths, growing skills, tools/platforms\n\n**5. Communication Style** — How the agent should talk to me: direct, concise, bullet points for lists, ask clarifying questions before big tasks\n\n**6. My Projects** — Brief description of each GitHub project\n\nAdd [FILL IN] placeholders where I need to add real values. Format as clean markdown with clear headings.',
       },
       {
         type: 'callout',
         variant: 'tip',
         title: '💡 The MEMORY.md Compound Effect',
-        text: 'Every time you add a detail to MEMORY.md — a company you interviewed with, a skill you just learned, a preference you discovered — every agent in your system gets smarter. It\'s the brain of your entire career AI stack.',
-      },
-      {
-        type: 'text',
-        markdown: `## Day 7: Build Your First AgentSkill
-
-An AgentSkill is a TypeScript plugin that extends what your OpenClaw agent can do. Every new capability you build goes here.`,
-      },
-      { type: 'diagram', id: 'agentskill-anatomy' },
-      {
-        type: 'cursor-prompt',
-        label: 'Build the GitHub Profile Skill',
-        description: 'Create ~/openclaw/extensions/tools/github-profile.ts:',
-        prompt: 'Create a TypeScript OpenClaw AgentSkill file at ~/openclaw/extensions/tools/github-profile.ts\n\nThe skill:\n- name: "get_github_profile"\n- description: "Fetches Deekshita\'s GitHub profile and recent public repositories. Returns formatted summary of repos, languages, stars, and descriptions. Use when asked about her projects or technical work."\n- parameters: { username: { type: "string", required: true, description: "GitHub username" } }\n\nThe handler:\n1. Fetch https://api.github.com/users/{username}\n2. Fetch https://api.github.com/users/{username}/repos?sort=pushed&per_page=10\n3. Filter out forks\n4. Return formatted markdown: profile summary + repo list with name, description, language, stars\n5. Handle API errors gracefully\n\nUse Node.js native fetch. Add type annotations. Export both `skill` and `handler`.',
+        text: 'Here\'s the difference between good and great:\n\nBad: "I\'m looking for data science roles."\nGood: "Must-haves: agentic AI in tech stack, Python-first, remote-first (not remote-optional). Immediately disqualify: pure BI/dashboard roles, banking/insurance sector, roles requiring relocation, roles where Excel is a key skill."\n\nThe second version makes every agent interaction 10x more useful. Be specific. Be opinionated. Update it whenever your preferences evolve.',
       },
       {
         type: 'step',
-        number: 4,
-        title: 'Register and test the skill',
-        code: { language: 'bash', content: `# Restart OpenClaw\ncd ~/openclaw && pnpm dev\n\n# Test in Telegram:\n# "What projects do I have on GitHub?"\n# → Agent calls get_github_profile\n# → Returns your actual repos` },
+        number: 5,
+        title: 'Test that MEMORY.md is working',
+        code: { language: 'bash', content: `# Send these to your Telegram bot:\n\n"What are my job deal-breakers?"\n# → Should list your actual deal-breakers from MEMORY.md\n\n"If someone offered me a BI Analyst role at a bank, should I apply?"\n# → Should reason from your preferences and say no with explanation\n\n"What are my core technical strengths?"\n# → Should list your real skills` },
+      },
+      {
+        type: 'text',
+        markdown: `## Day 8: Build Your First Custom AgentSkill
+
+You've activated built-in skills and written your MEMORY.md. Now you go beyond what OpenClaw ships with. Every custom skill follows this pattern:`,
+      },
+      { type: 'diagram', id: 'agentskill-anatomy' },
+      {
+        type: 'text',
+        markdown: `## The AgentSkill Interface (Memorise This)
+
+\`\`\`typescript
+// Export 1: DEFINITION — the LLM reads this to decide WHEN to call your skill
+export const skill = {
+  name: 'tool_name',
+  description: 'Use this when the user asks about X or wants to do Y. ' +
+               'Returns Z formatted as markdown. Do NOT use for...',
+  parameters: {
+    type: 'object',
+    properties: {
+      username: { type: 'string', description: 'The GitHub username' }
+    },
+    required: ['username']
+  }
+}
+
+// Export 2: HANDLER — the function that runs when the LLM calls your skill
+export async function handler(params: Record<string, unknown>): Promise<string> {
+  const { username } = params as { username: string }
+  // Do the work, return a string
+  // The LLM reads this string as the tool result
+  return \`Result: ...\`
+}
+\`\`\`
+
+**The single most important thing:** The \`description\` field is a prompt to the LLM. It decides whether the agent uses your skill or ignores it. Vague description = agent won't know when to call it.`,
+      },
+      {
+        type: 'cursor-prompt',
+        label: 'Skill 1: GitHub Profile Reader',
+        description: 'Create ~/openclaw/extensions/tools/github-profile.ts:',
+        prompt: 'Create a TypeScript OpenClaw AgentSkill at ~/openclaw/extensions/tools/github-profile.ts\n\nexport const skill:\n- name: "get_github_profile"\n- description: "Use this when the user asks about their GitHub projects, repositories, code portfolio, or technical work. Fetches real profile data and repos. Returns formatted markdown with profile summary and top 10 non-forked repos including name, description, language, and star count."\n- parameters: { username: { type: "string", required: true, description: "GitHub username" } }\n\nexport async function handler:\n1. Fetch https://api.github.com/users/{username}\n2. Fetch https://api.github.com/users/{username}/repos?sort=pushed&per_page=15\n3. Filter out forks\n4. Return formatted markdown: profile summary (name, bio, location, followers, repo count) + numbered list of top 10 repos\n5. Handle 404 (user not found), rate limit, network errors\n6. Use Node.js native fetch (v22+)\n\nComment at top: // OpenClaw AgentSkill — GitHub Profile Reader',
+      },
+      {
+        type: 'cursor-prompt',
+        label: 'Skill 2: Profile Context Loader',
+        description: 'Create ~/openclaw/extensions/tools/profile-context.ts:',
+        prompt: 'Create a TypeScript OpenClaw AgentSkill at ~/openclaw/extensions/tools/profile-context.ts\n\nexport const skill:\n- name: "get_my_profile"\n- description: "Use this when you need detailed information about the user — their career goals, job preferences, skills, deal-breakers, or background. Reads their personal profile document. Use proactively when making recommendations about jobs or career decisions."\n- parameters: empty object (no inputs needed)\n\nexport async function handler:\n- Use Node.js fs/promises to read ~/.openclaw/workspaces/default/MEMORY.md (use os.homedir() + path.join)\n- Return the full file content\n- If file missing: return helpful error message explaining how to create it\n\nComment at top: // OpenClaw AgentSkill — Profile Context Loader',
+      },
+      {
+        type: 'cursor-prompt',
+        label: 'Skill 3: Memory Journal (Save + Recall)',
+        description: 'Create ~/openclaw/extensions/tools/memory-journal.ts — two skills in one file:',
+        prompt: 'Create ~/openclaw/extensions/tools/memory-journal.ts with TWO AgentSkills.\n\nSkill 1 — add_memory:\n- name: "add_memory"\n- description: "Use when the user says \'remember\', \'note this\', \'save this\', or after any important interaction worth recording (interview, job application, insight, decision). Saves timestamped note to daily log."\n- parameters: { note: { type: "string", required: true } }\n- handler: Append "[HH:MM] {note}" to ~/.openclaw/workspaces/default/memory/YYYY-MM-DD.md (today\'s date). Create file/dirs if needed. Return "Memory saved."\n\nSkill 2 — recall_memory:\n- name: "recall_memory"\n- description: "Use when user asks what was noted recently, what happened today/yesterday, or to recall something specific. Returns notes from a given date."\n- parameters: { date: { type: "string", description: "Date in YYYY-MM-DD format, defaults to today" } }\n- handler: Read ~/.openclaw/workspaces/default/memory/{date}.md. Return content or "No notes for {date}."\n\nExport all four: skill1, handler1, skill2, handler2 (adjust to OpenClaw\'s multi-skill file format if needed).',
+      },
+      {
+        type: 'step',
+        number: 6,
+        title: 'Register all skills and run the full test suite',
+        code: { language: 'bash', content: `# Add to ~/.openclaw/config.json skills section:\n# get_github_profile, get_my_profile, add_memory, recall_memory\n# Then restart:\ncd ~/openclaw && pnpm dev\n\n# Full test suite in Telegram:\n# "Tell me about my GitHub projects"\n# "What are my job deal-breakers?"\n# "Remember: I started building my first AgentSkill today"\n# "What did I note today?"\n# "I'm looking at a Google DeepMind ML role — should I apply?"` },
       },
       {
         type: 'callout',
         variant: 'wisdom',
-        title: '🔮 Words of Wisdom',
-        text: 'The skill\'s description field is everything. Test this: change it to something vague and the agent stops using the skill at the right time. Change it back to specific and precise — it works perfectly. You\'re writing prompts inside your code. Always be specific.',
+        title: '🔮 The Skill-Building Pattern',
+        text: 'Memorise this loop — you\'ll repeat it for every skill you build:\n\n1. Define the goal: "I want my agent to be able to [X]"\n2. Write the skill file: description + handler\n3. Register in config.json\n4. Restart: pnpm dev\n5. Test with a natural language message in Telegram\n6. Iterate: if agent doesn\'t call it → improve description. If output isn\'t useful → improve handler.\n\nBy Module 7, you\'ll do this in 15 minutes per skill. Right now it takes an hour. That\'s fine.',
       },
       {
         type: 'checkpoint',
         items: [
-          { id: 'm2-c1', text: 'OpenClaw installed and running (`pnpm dev` shows "Agent ready")' },
-          { id: 'm2-c2', text: 'Telegram bot connected — agent responds to messages on your phone' },
-          { id: 'm2-c3', text: 'MEMORY.md filled in with your real details and job preferences' },
-          { id: 'm2-c4', text: 'github-profile skill built and deployed' },
-          { id: 'm2-c5', text: 'Tested from Telegram: "What are my GitHub projects?" → real repos returned' },
-          { id: 'm2-c6', text: 'You understand what the skill `description` field does' },
+          { id: 'm2-c1', text: 'OpenClaw starts with `pnpm dev` and shows "Agent ready"' },
+          { id: 'm2-c2', text: 'Telegram bot responds — you\'ve had a real conversation with it' },
+          { id: 'm2-c3', text: 'At least 5 built-in skills activated (web-search, url-reader, memory-write, memory-read, read-file)' },
+          { id: 'm2-c4', text: 'Web search works — asked "what agentic AI companies are hiring?" and got real results' },
+          { id: 'm2-c5', text: 'MEMORY.md is filled in with your real details (no [FILL IN] placeholders remaining)' },
+          { id: 'm2-c6', text: 'get_github_profile works — "tell me about my projects" returns your actual repos' },
+          { id: 'm2-c7', text: 'add_memory works — saved a note, then recall_memory returned it' },
+          { id: 'm2-c8', text: 'You can write a new AgentSkill from scratch without looking at a reference' },
         ],
       },
     ],

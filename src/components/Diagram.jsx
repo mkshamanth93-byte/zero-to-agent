@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 const diagrams = {
   'react-loop': ReactLoopDiagram,
   'agent-anatomy': AgentAnatomyDiagram,
+  'openclaw-hub': OpenClawHubDiagram,
   'openclaw-arch': OpenClawArchDiagram,
   'agentskill-anatomy': AgentSkillDiagram,
   'rag-pipeline': RAGPipelineDiagram,
@@ -76,6 +77,57 @@ function AgentAnatomyDiagram() {
   └──────────────────────────────────────────┘
         `}</pre>
       </div>
+    </div>
+  )
+}
+
+function OpenClawHubDiagram() {
+  const skills = [
+    { label: 'web-search', color: '#6366f1' },
+    { label: 'memory', color: '#8b5cf6' },
+    { label: 'github-profile', color: '#06b6d4' },
+    { label: 'job-scorer', color: '#10b981' },
+    { label: 'cover-letter', color: '#f59e0b' },
+    { label: 'read-file', color: '#ec4899' },
+  ]
+  return (
+    <div className="diagram diagram-hub">
+      <div className="diagram-title">OpenClaw — Hub & Spoke Mental Model</div>
+      <div className="hub-layout">
+        <div className="hub-left">
+          <div className="hub-channel-group">
+            {['Telegram', 'WhatsApp', 'Discord', 'Web UI'].map((c) => (
+              <motion.div key={c} className="hub-channel"
+                initial={{ opacity: 0, x: -16 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+                {c}
+              </motion.div>
+            ))}
+          </div>
+          <div className="hub-arrow-label">channels</div>
+        </div>
+        <div className="hub-arrow">→</div>
+        <motion.div className="hub-centre"
+          initial={{ opacity: 0, scale: 0.85 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}>
+          <div className="hub-centre-label">OPENCLAW</div>
+          <div className="hub-centre-sub">Gateway + Runtime</div>
+          <div className="hub-memory-badge">MEMORY.md</div>
+        </motion.div>
+        <div className="hub-arrow">→</div>
+        <div className="hub-right">
+          <div className="hub-skills-group">
+            {skills.map((s, i) => (
+              <motion.div key={s.label} className="hub-skill"
+                style={{ '--skill-color': s.color }}
+                initial={{ opacity: 0, x: 16 }} whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }} transition={{ delay: i * 0.08 }}>
+                {s.label}
+              </motion.div>
+            ))}
+          </div>
+          <div className="hub-arrow-label">agentskills</div>
+        </div>
+      </div>
+      <div className="diagram-caption">All of this runs on your Mac. Your data never leaves unless you call an external API.</div>
     </div>
   )
 }

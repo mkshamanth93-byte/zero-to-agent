@@ -468,6 +468,41 @@ kbd {
   color: var(--muted); font-style: italic; margin-top: 0.5rem;
 }
 
+/* OpenClaw Hub Diagram */
+.diagram-hub { }
+.hub-layout {
+  display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; justify-content: center;
+}
+.hub-left, .hub-right { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
+.hub-channel-group, .hub-skills-group { display: flex; flex-direction: column; gap: 0.3rem; }
+.hub-channel {
+  background: var(--card-2); border: 1px solid var(--border);
+  border-radius: 6px; padding: 0.25rem 0.7rem;
+  font-size: 0.72rem; color: var(--text-dim); font-weight: 500;
+}
+.hub-skill {
+  background: rgba(from var(--skill-color) r g b / 0.12);
+  border: 1px solid rgba(from var(--skill-color) r g b / 0.35);
+  border-radius: 6px; padding: 0.25rem 0.7rem;
+  font-size: 0.7rem; color: var(--skill-color); font-family: 'JetBrains Mono', monospace;
+}
+.hub-arrow { color: var(--accent); font-size: 1.2rem; font-weight: 700; }
+.hub-arrow-label {
+  font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--muted); font-family: 'JetBrains Mono', monospace;
+}
+.hub-centre {
+  background: rgba(99,102,241,0.12); border: 2px solid rgba(99,102,241,0.4);
+  border-radius: 14px; padding: 1.25rem 1.75rem; text-align: center; min-width: 140px;
+}
+.hub-centre-label { font-size: 0.85rem; font-weight: 800; color: var(--accent); letter-spacing: 0.05em; }
+.hub-centre-sub { font-size: 0.68rem; color: var(--muted); margin: 0.25rem 0; }
+.hub-memory-badge {
+  display: inline-block; background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.3);
+  border-radius: 4px; padding: 0.15rem 0.5rem;
+  font-size: 0.65rem; color: #34d399; font-family: 'JetBrains Mono', monospace; margin-top: 0.4rem;
+}
+
 .diagram-openclaw { }
 .diagram-openclaw-layout {
   display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
