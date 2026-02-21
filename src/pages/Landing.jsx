@@ -7,23 +7,23 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 const PAIN_POINTS = [
   {
     icon: '🧱',
-    heading: 'You hit a wall.',
-    body: 'You built something in Cursor, Lovable, or Replit. It worked. Then you tried to make it smarter — and didn\'t know what to do next.',
+    heading: 'You built something. Then hit a wall.',
+    body: 'You used AI to ship something — an app, a prototype, a workflow. It worked. Then you tried to go further and didn\'t know where to turn.',
   },
   {
     icon: '🗺️',
-    heading: 'You can see the potential. Not the path.',
-    body: 'You know agents are the next thing. You can imagine what you\'d build. You just don\'t know how to get from here to there.',
+    heading: 'You can see what\'s possible. Not how to get there.',
+    body: 'You\'ve seen what agents can do. You can imagine exactly what you\'d build for your business or your life. You just don\'t know the path from here to there.',
   },
   {
     icon: '📚',
     heading: 'You\'ve started 5 courses. Finished 0.',
-    body: 'Generic tutorials. Todo apps. Calculator projects. Nothing that matters to your actual life or business. You lose interest because none of it is real.',
+    body: 'Generic tutorials. Todo apps. Calculator projects. Nothing that connects to your actual work or business. You stop because none of it feels real.',
   },
   {
-    icon: '🎯',
-    heading: 'You have a use case. No clear way to build it.',
-    body: 'A dental practice that needs automation. A recruiting pipeline. A personal AI assistant. You can see it. You just can\'t build it. Yet.',
+    icon: '💡',
+    heading: 'You\'re a PM, designer, or operator — and you want in.',
+    body: 'You understand the product. You can see where AI fits. You just need a structured path that meets you where you are — not one written only for developers.',
   },
 ]
 
@@ -334,17 +334,17 @@ export default function Landing() {
           >
             <div className="lp-hero-eyebrow">
               <span className="lp-hero-eyebrow-dot" />
-              For builders on Cursor · Lovable · Replit
+              For vibe coders, builders, PMs &amp; operators who want to go deeper
             </div>
             <h1 className="lp-hero-headline">
-              You found Cursor.
+              You've started building.
               <br />
-              <span className="lp-gradient-text">Now go further.</span>
+              <span className="lp-gradient-text">Now make it work for you.</span>
             </h1>
             <p className="lp-hero-sub">
-              OpenLearn is the 30-day programme that turns vibe coders into agentic engineers.
-              Adapted to your industry, your tools, your actual automation goal.
-              Real systems — not tutorials that go nowhere.
+              OpenLearn is the 30-day programme that takes anyone who's built something with AI
+              — or wants to — and turns them into an agentic engineer. Adapted to your industry,
+              your tools, your actual goal. Real systems, not tutorials that lead nowhere.
             </p>
 
             <div className="lp-hero-ctas">
@@ -399,8 +399,8 @@ export default function Landing() {
         <div className="lp-container">
           <div className="lp-section-eyebrow">Sound familiar?</div>
           <h2 className="lp-section-heading">
-            You're not stuck because you're not smart enough.
-            <br />You're stuck because no course was built for where you actually are.
+            You're not behind because you're not technical enough.
+            <br />You're behind because no course was built for where you actually are.
           </h2>
           <div className="lp-pain-grid">
             {PAIN_POINTS.map((p, i) => (
@@ -438,6 +438,55 @@ export default function Landing() {
               Build my course — it's free →
             </motion.button>
           </motion.div>
+        </div>
+      </section>
+
+      {/* ── Who it's for ─────────────────────────────────────────────────── */}
+      <section className="lp-section lp-section--who">
+        <div className="lp-container">
+          <div className="lp-section-eyebrow">This is for you if...</div>
+          <div className="lp-who-grid">
+            {[
+              {
+                icon: '🤖',
+                label: 'You\'ve used AI to build something',
+                desc: 'You\'ve shipped something with AI tools. An app, a prototype, a workflow. It worked. Now you want to understand what\'s actually happening under the hood — and take it further.',
+                tag: 'Vibe coder',
+                tagColor: '#6366f1',
+              },
+              {
+                icon: '🏗️',
+                label: 'You\'re trying to build something specific',
+                desc: 'You have a use case in mind — for your business, your job, your life. You\'ve maybe started once or twice. You just need the right structure to actually finish it.',
+                tag: 'Builder',
+                tagColor: '#f97316',
+              },
+              {
+                icon: '🎯',
+                label: 'You\'re a PM, designer, or operator',
+                desc: 'You understand the product and the business. You can see exactly where AI fits in your workflows. You want to build it yourself — not wait for engineering to prioritise it.',
+                tag: 'Non-dev builder',
+                tagColor: '#06b6d4',
+              },
+            ].map((who, i) => (
+              <motion.div
+                key={i}
+                className="lp-who-card"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.12, duration: 0.5 }}
+              >
+                <div className="lp-who-tag" style={{ color: who.tagColor, borderColor: who.tagColor + '40', background: who.tagColor + '12' }}>{who.tag}</div>
+                <div className="lp-who-icon">{who.icon}</div>
+                <h3 className="lp-who-heading">{who.label}</h3>
+                <p className="lp-who-body">{who.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+          <div className="lp-who-note">
+            No CS degree required. No years of Python experience required. If you can describe what you want to automate, you can complete this course.
+          </div>
         </div>
       </section>
 
@@ -527,11 +576,12 @@ export default function Landing() {
           <h2 className="lp-section-heading">
             16 industries.
             <br />
-            <span className="lp-gradient-text">One course. Yours.</span>
+            <span className="lp-gradient-text">Every role. Yours.</span>
           </h2>
           <p className="lp-section-sub">
-            Whether you're a dental practice owner, a recruiter, a data scientist, or someone
-            who just wants to automate their life — the course builds around your specific context.
+            Dental practice owner. Sales manager. Product manager. Data scientist. Designer. HR lead.
+            Someone automating their own life. If you have a domain and a goal,
+            the course builds around your specific context — not a generic learner.
           </p>
           <div className="lp-industry-grid">
             {INDUSTRIES.map((ind, i) => (
@@ -640,13 +690,14 @@ export default function Landing() {
               Free · Adapts to you · Starts in 5 minutes
             </div>
             <h2 className="lp-final-heading">
-              Stop watching tutorials.
+              You don't need to be a developer.
               <br />
-              <span className="lp-gradient-text">Start shipping agents.</span>
+              <span className="lp-gradient-text">You just need to start.</span>
             </h2>
             <p className="lp-final-sub">
-              The gap between vibe coding and agentic engineering is 30 days of the right structure.
-              Tell us your world. We'll build the course. You build the system.
+              Whether you've already built something with AI tools or you're about to,
+              the gap between where you are and a working agentic system is 30 structured days.
+              Tell us your world. We build the course around it.
             </p>
             <motion.button
               className="lp-cta-primary lp-cta-primary--lg"
