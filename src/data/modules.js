@@ -18,8 +18,8 @@ export const MODULES = [
       {
         type: 'callout',
         variant: 'welcome',
-        title: 'Welcome to Zero → Agent.',
-        text: 'In 30 days you\'re going to build five AI systems, deploy them to your phone, and become someone who can walk into any agentic AI interview and talk from real experience. Not theory. Not tutorials you half-finished. Real, working systems you built yourself. Let\'s start.',
+        title: 'You already have the hard part.',
+        text: 'You know Python. You know how ML systems are built. You know how to think analytically and ship code. This course gives you the agentic layer on top of that — the architecture, the frameworks, the infrastructure, and the working systems. 30 days from now you\'ll have five real projects, a personal AI agent on your phone, and a job application engine. In Cursor. Let\'s build.',
       },
       {
         type: 'text',
@@ -253,8 +253,8 @@ Before you write any agent code, your environment needs to be ready. Do this onc
       },
       {
         type: 'cursor-prompt',
-        label: 'Your First Cursor Prompt',
-        description: 'Open ~/agent-course in Cursor. Press Cmd+L. Paste this:',
+        label: 'Verify Your Setup',
+        description: 'In Cursor, open the agent-course workspace root. Open Agent (Cmd+I), make sure "Agent" is selected in the dropdown, then paste:',
         prompt: 'Create a file called `verify_setup.py`. It should: (1) Load environment variables from .env using python-dotenv. (2) Check that OPENAI_API_KEY is set and print "OpenAI key: ✓". (3) Make a simple OpenAI API call asking "Say hello in one sentence" and print the response. (4) Print "🚀 Setup complete! You\'re ready to build agents." Handle errors with clear messages.',
       },
       {
@@ -316,7 +316,7 @@ Tools are just Python functions with a special decorator. The docstring is what 
       {
         type: 'cursor-prompt',
         label: 'Build Your Tools',
-        description: 'In ~/agent-course/module-1, open Cursor (Cmd+L) and paste:',
+        description: 'In Cursor, navigate to the module-1 folder in the Explorer (left panel). Open Agent (Cmd+I), select "Agent" mode, then paste:',
         prompt: 'Create a file called `tools.py`. Define three LangChain tools using the @tool decorator:\n\n1. `web_search(query: str)` — uses DuckDuckGo to search and returns the top 3 results as formatted text with title, URL, and snippet.\n\n2. `calculate(expression: str)` — safely evaluates a math expression using Python eval with restricted namespace. Returns the result as a string.\n\n3. `get_today_date()` — returns today\'s date as a formatted string with day name.\n\nAdd descriptive docstrings to each — the LLM reads these to decide when to use the tool.',
       },
       {
@@ -328,7 +328,7 @@ Tools are just Python functions with a special decorator. The docstring is what 
       {
         type: 'cursor-prompt',
         label: 'Build the Agent',
-        description: 'Now create the agent itself:',
+        description: 'Still in module-1 in Cursor Agent (Cmd+I). Cursor already has context from tools.py — paste this next:',
         prompt: 'Create `agent.py`. Using LangChain, build a ReAct agent:\n\n1. Use ChatOpenAI with model "gpt-4o-mini" (cheaper for learning)\n2. Load OPENAI_API_KEY from .env with python-dotenv\n3. System prompt: "You are DS — a sharp research assistant built for Deekshita Sridhar, a Data Scientist and Agentic AI Engineer. You are direct, precise, and always cite sources. You flag when you\'re uncertain. You have a slight dry sense of humour."\n4. Include all three tools from tools.py\n5. Add ConversationBufferWindowMemory (last 5 exchanges)\n6. Set verbose=True so reasoning steps are visible\n7. main() loop: user types → agent responds → repeat until "quit"',
       },
       {
@@ -357,7 +357,7 @@ The best way to understand a system is to break it. Try these inputs and observe
       {
         type: 'cursor-prompt',
         label: 'Add Error Handling & Webpage Reading',
-        description: 'Improve your agent\'s capabilities:',
+        description: 'Open tools.py and agent.py in Cursor, then open Agent (Cmd+I). Cursor will see both files and apply changes to both:',
         prompt: 'In tools.py, add a fourth tool: `read_webpage(url: str)`. It should use `requests` to fetch the URL, `BeautifulSoup` to extract text (strip scripts, styles, nav, footer), truncate to 2500 characters, and return clean text. Docstring: "Fetches and reads the full text content of a webpage URL. Use after web_search when you need more detail than the snippet provides."\n\nAlso update the system prompt in agent.py to handle these edge cases: (1) For recent events, note search results may be a few days old. (2) For ambiguous queries, ask one clarifying question. (3) For impossible tasks, clearly explain what it can and cannot do.',
       },
       {
@@ -369,7 +369,7 @@ Your agent currently forgets everything when you restart it. Let's fix that.`,
       {
         type: 'cursor-prompt',
         label: 'Add Persistent Memory',
-        description: 'Give your agent memory that survives restarts:',
+        description: 'Open agent.py in Cursor. Use Cursor Agent (Cmd+I) — it will edit agent.py directly and create the new file:',
         prompt: 'Update agent.py to add conversation persistence:\n\n1. At startup, load conversation history from `conversation_history.json` if it exists\n2. After each exchange, append the user/agent pair to this file\n3. Print at startup: "Loaded X previous conversations"\n4. Command `/clear` wipes the history file\n5. Command `/history` prints the last 5 exchanges\n6. Command `/help` lists all commands\n\nBonus: add a `/save [label]` command that saves the current conversation with a label for future reference.',
       },
       {
@@ -448,7 +448,8 @@ OpenClaw is a **self-hosted** AI agent platform. It runs on your Mac, not in the
       {
         type: 'cursor-prompt',
         label: 'Configure OpenClaw',
-        description: 'Open ~/.openclaw/config.json in Cursor:',
+        description: 'In Cursor, open ~/.openclaw/config.json (File → Open File). Use Cursor Chat (Cmd+L) to generate the config, then paste it into the file:',
+        mode: 'chat',
         prompt: 'Show me how to configure ~/.openclaw/config.json with: (1) Telegram channel enabled with my bot token [PASTE TOKEN HERE], (2) OpenAI provider with gpt-4o model, (3) these built-in skills enabled: web-search, url-reader, memory-write, memory-read, read-file, run-python. Show me the complete config.json structure.',
       },
       {
@@ -505,8 +506,8 @@ This is the most important thing you'll do this module. **Everything your agent 
       },
       {
         type: 'cursor-prompt',
-        label: 'Build Your MEMORY.md',
-        description: 'Open ~/.openclaw/workspaces/default/MEMORY.md in Cursor:',
+        label: 'Write Your MEMORY.md',
+        description: 'In Cursor, open ~/.openclaw/workspaces/default/MEMORY.md (File → Open File, or Cmd+P and type MEMORY). Open Cursor Agent (Cmd+I) and let it write the whole file:',
         prompt: 'Write a comprehensive MEMORY.md for my OpenClaw personal AI agent. This file is read before every conversation — it must contain everything the agent needs to help me effectively.\n\nSections to include:\n\n**1. Identity** — Name: Deekshita Sridhar, Data Scientist & Agentic AI Engineer, GitHub: dsridhar2110\n\n**2. Career Status** — Currently job hunting. Target: Senior DS or ML Engineer with agentic AI components. Remote-first or hybrid. Open to contract or permanent.\n\n**3. Job Preferences (be very specific):**\n- Must-haves (e.g. agentic AI in tech stack, Python-first, remote-first culture)\n- Deal-breakers (no pure banking/insurance, no BI-only roles, no relocation)\n- Salary: [my minimum — non-negotiable]\n- Target industries: tech, fintech, healthtech, AI-native startups\n\n**4. Technical Skills** — Group by: core strengths, growing skills, tools/platforms\n\n**5. Communication Style** — How the agent should talk to me: direct, concise, bullet points for lists, ask clarifying questions before big tasks\n\n**6. My Projects** — Brief description of each GitHub project\n\nAdd [FILL IN] placeholders where I need to add real values. Format as clean markdown with clear headings.',
       },
       {
@@ -561,19 +562,19 @@ export async function handler(params: Record<string, unknown>): Promise<string> 
       {
         type: 'cursor-prompt',
         label: 'Skill 1: GitHub Profile Reader',
-        description: 'Create ~/openclaw/extensions/tools/github-profile.ts:',
+        description: 'In Cursor, navigate to ~/openclaw/extensions/tools/ in the Explorer. Open Cursor Agent (Cmd+I) — it will create the file directly in that folder:',
         prompt: 'Create a TypeScript OpenClaw AgentSkill at ~/openclaw/extensions/tools/github-profile.ts\n\nexport const skill:\n- name: "get_github_profile"\n- description: "Use this when the user asks about their GitHub projects, repositories, code portfolio, or technical work. Fetches real profile data and repos. Returns formatted markdown with profile summary and top 10 non-forked repos including name, description, language, and star count."\n- parameters: { username: { type: "string", required: true, description: "GitHub username" } }\n\nexport async function handler:\n1. Fetch https://api.github.com/users/{username}\n2. Fetch https://api.github.com/users/{username}/repos?sort=pushed&per_page=15\n3. Filter out forks\n4. Return formatted markdown: profile summary (name, bio, location, followers, repo count) + numbered list of top 10 repos\n5. Handle 404 (user not found), rate limit, network errors\n6. Use Node.js native fetch (v22+)\n\nComment at top: // OpenClaw AgentSkill — GitHub Profile Reader',
       },
       {
         type: 'cursor-prompt',
         label: 'Skill 2: Profile Context Loader',
-        description: 'Create ~/openclaw/extensions/tools/profile-context.ts:',
+        description: 'Still in the openclaw/extensions/tools/ folder in Cursor. Open Agent (Cmd+I) and create the next skill:',
         prompt: 'Create a TypeScript OpenClaw AgentSkill at ~/openclaw/extensions/tools/profile-context.ts\n\nexport const skill:\n- name: "get_my_profile"\n- description: "Use this when you need detailed information about the user — their career goals, job preferences, skills, deal-breakers, or background. Reads their personal profile document. Use proactively when making recommendations about jobs or career decisions."\n- parameters: empty object (no inputs needed)\n\nexport async function handler:\n- Use Node.js fs/promises to read ~/.openclaw/workspaces/default/MEMORY.md (use os.homedir() + path.join)\n- Return the full file content\n- If file missing: return helpful error message explaining how to create it\n\nComment at top: // OpenClaw AgentSkill — Profile Context Loader',
       },
       {
         type: 'cursor-prompt',
         label: 'Skill 3: Memory Journal (Save + Recall)',
-        description: 'Create ~/openclaw/extensions/tools/memory-journal.ts — two skills in one file:',
+        description: 'Same folder in Cursor. Open Agent (Cmd+I). This creates a file with two exported skills — Cursor Agent handles multi-export files cleanly:',
         prompt: 'Create ~/openclaw/extensions/tools/memory-journal.ts with TWO AgentSkills.\n\nSkill 1 — add_memory:\n- name: "add_memory"\n- description: "Use when the user says \'remember\', \'note this\', \'save this\', or after any important interaction worth recording (interview, job application, insight, decision). Saves timestamped note to daily log."\n- parameters: { note: { type: "string", required: true } }\n- handler: Append "[HH:MM] {note}" to ~/.openclaw/workspaces/default/memory/YYYY-MM-DD.md (today\'s date). Create file/dirs if needed. Return "Memory saved."\n\nSkill 2 — recall_memory:\n- name: "recall_memory"\n- description: "Use when user asks what was noted recently, what happened today/yesterday, or to recall something specific. Returns notes from a given date."\n- parameters: { date: { type: "string", description: "Date in YYYY-MM-DD format, defaults to today" } }\n- handler: Read ~/.openclaw/workspaces/default/memory/{date}.md. Return content or "No notes for {date}."\n\nExport all four: skill1, handler1, skill2, handler2 (adjust to OpenClaw\'s multi-skill file format if needed).',
       },
       {
@@ -651,19 +652,19 @@ This is called **iterative deepening**. It's how a good analyst actually researc
       {
         type: 'cursor-prompt',
         label: 'Build the Research Agent',
-        description: 'In ~/agent-course/module-3, open Cursor and paste:',
+        description: 'In Cursor, navigate to module-3 in the Explorer. Open Agent (Cmd+I). This is a multi-file build — Agent mode handles the LangGraph state machine and all imports:',
         prompt: 'Create `research_agent.py` using LangGraph StateGraph. Build these nodes:\n\n1. `decompose` — LLM breaks the question into 3-4 specific sub-questions\n2. `search` — DuckDuckGo searches each sub-question, stores results in state\n3. `read_top_result` — Fetches and extracts text from the top URL for each sub-question\n4. `evaluate` — LLM decides: "sufficient" or returns list of gap queries\n5. `synthesise` — Produces structured markdown: Summary, Key Findings (with source URLs), Limitations, Further Reading\n\nStateGraph edges: decompose→search→read→evaluate→(synthesise if sufficient, else search with gap queries). Add MAX_LOOPS=2 to prevent infinite loops.\n\nAccepts topic as sys.argv[1]. Saves output to research_outputs/{slugified-topic}-{date}.md. Prints to stdout.',
       },
       {
         type: 'cursor-prompt',
         label: 'Add the \'What This Means For You\' Section',
-        description: 'Make the output personally relevant:',
+        description: 'Open research_agent.py in Cursor. Use Cursor Agent (Cmd+I) — it will edit the synthesise node in place:',
         prompt: 'Update the `synthesise` node in research_agent.py. After Key Findings, add a section "What This Means For You" — using the context that this is for Deekshita Sridhar, a Data Scientist actively seeking agentic AI roles, make the findings personally relevant. Also add: a Confidence Score (Low/Medium/High) with one sentence explaining why, and three "Suggested Follow-up Questions" to go deeper.',
       },
       {
         type: 'cursor-prompt',
         label: 'Deploy as OpenClaw Skill',
-        description: 'Create ~/openclaw/extensions/tools/research-agent.ts:',
+        description: 'In Cursor, switch to the openclaw/extensions/tools/ folder. Open Agent (Cmd+I) — it creates the TypeScript wrapper that calls your Python agent as a subprocess:',
         prompt: 'Create an OpenClaw AgentSkill TypeScript file `research-agent.ts`.\n- name: "research_topic"\n- description: "Performs deep autonomous web research on any topic using iterative search. Returns a structured brief with key findings, citations, and personal relevance. Use for any research request, market analysis, technical learning, or company investigation."\n- parameters: { topic: { type: "string", required: true } }\n\nHandler: spawn Python subprocess running research_agent.py with topic as argument. Wait up to 120s. Return stdout output.',
       },
       {
@@ -718,19 +719,19 @@ This is called **iterative deepening**. It's how a good analyst actually researc
       {
         type: 'cursor-prompt',
         label: 'Build the Knowledge Base',
-        description: 'In ~/agent-course/module-4:',
+        description: 'In Cursor, navigate to module-4 in the Explorer. Open Agent (Cmd+I) — this script fetches from GitHub API and builds a Chroma vector DB:',
         prompt: 'Create `build_knowledge_base.py`:\n\n1. GitHub API: fetch all public repos for GITHUB_USERNAME from .env\n2. For each repo: fetch README.md + list of files + top 3 .py files (max 5000 chars each)\n3. Combine into one document per repo: name + description + README + code\n4. Also load MEMORY.md from path passed as sys.argv[1]\n5. Split all docs: RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)\n6. Embed: OpenAIEmbeddings(model="text-embedding-3-small")\n7. Store: Chroma vector DB persisted to ./portfolio_db\n8. Print progress: "Indexing: [repo-name]"\n9. Final: "Indexed X documents, Y chunks"',
       },
       {
         type: 'cursor-prompt',
         label: 'Build the Q&A Agent',
-        description: 'Now create the conversational agent over your portfolio:',
+        description: 'Still in module-4 in Cursor. The knowledge base script must run first (Step 1 above). Then open Agent (Cmd+I) — it will see build_knowledge_base.py in context:',
         prompt: 'Create `portfolio_agent.py`:\n\n1. Load Chroma DB from ./portfolio_db\n2. Retriever: top 5 most relevant chunks per query\n3. ConversationalRetrievalChain with:\n   - ChatOpenAI gpt-4o-mini\n   - System prompt: "You are Deekshita\'s portfolio assistant. Answer questions about her projects, skills, and experience using ONLY the provided context. Be specific — name actual projects. If the answer isn\'t in the context, say so clearly."\n   - ConversationBufferMemory\n4. After each answer, print "📎 Sources: [list of source documents used]"\n5. Interactive main() loop',
       },
       {
         type: 'cursor-prompt',
         label: 'Generate STAR Interview Answers',
-        description: 'Add automated interview prep:',
+        description: 'Open portfolio_agent.py in Cursor. Use Agent (Cmd+I) — it edits the existing file and adds the new CLI mode:',
         prompt: 'Add function `generate_star_answers(job_description: str)` to portfolio_agent.py:\n1. Extract 5 key technical requirements from the JD using LLM\n2. For each requirement: retrieve relevant portfolio context from Chroma\n3. Generate STAR-format answer (Situation/Task/Action/Result) grounded in real project details\n4. Keep each answer to ~90-120 seconds of speaking time\n5. After each answer: add "Likely follow-up: [most probable follow-up question]"\n6. Save to interview_preps/{company}-{date}.md\n\nCLI: `python portfolio_agent.py --prep "paste JD here"`',
       },
       {
@@ -778,13 +779,13 @@ This is called **iterative deepening**. It's how a good analyst actually researc
       {
         type: 'cursor-prompt',
         label: 'Build the Code Executor',
-        description: 'In ~/agent-course/module-5:',
+        description: 'In Cursor, navigate to module-5. Open Agent (Cmd+I) — the executor sandbox is the most security-sensitive part of this module, let Cursor handle all the safe-exec boilerplate:',
         prompt: 'Create `code_executor.py`. Build a safe Python code execution environment:\n\n1. Accepts: a string of Python code + a pandas DataFrame as context\n2. Available in the execution environment: pandas as pd, numpy as np, matplotlib.pyplot as plt, scipy.stats, and the variable `df`\n3. Captures stdout output\n4. Saves any matplotlib figures to analysis_outputs/ as PNG files\n5. Returns dict: { output: str, figures: [filename], error: str|None }\n6. Hard 30-second timeout\n7. Blocks network calls and writes outside analysis_outputs/\n\nAdd a function `safe_exec(code, df)` as the main interface.',
       },
       {
         type: 'cursor-prompt',
         label: 'Build the Analysis Agent',
-        description: 'Now the full LangGraph pipeline:',
+        description: 'Still in module-5. Open code_executor.py first so Cursor has it in context, then open Agent (Cmd+I) to build the LangGraph pipeline on top:',
         prompt: 'Create `analysis_agent.py` using LangGraph:\n\nNodes:\n1. `load_data` — pandas read_csv, stores df in state, produces data summary (shape, dtypes, nulls, head(5), describe())\n2. `plan_analysis` — LLM sees the summary, produces 5-7 specific analyses as a numbered list\n3. `execute` — for each planned analysis: LLM writes the pandas/matplotlib code → safe_exec runs it → stores results\n4. `retry_failed` — if code fails: LLM sees the error + original code, rewrites once. If fails again: skip with a note.\n5. `interpret` — LLM reads ALL outputs and writes plain-English interpretations with confidence scores\n6. `report` — assembles markdown executive report: Data Overview, Key Findings (numbered, with confidence), Visualisations list, Recommended Actions, Data Quality Notes\n\nSave report to analysis_outputs/report-{filename}-{date}.md\nAccept CSV path as sys.argv[1]',
       },
       {
@@ -839,13 +840,13 @@ This is called **iterative deepening**. It's how a good analyst actually researc
       {
         type: 'cursor-prompt',
         label: 'Build the Full Prep Pipeline',
-        description: 'In ~/agent-course/module-6:',
+        description: 'In Cursor, navigate to module-6 in the Explorer. Open Agent (Cmd+I) — this is a multi-node LangGraph build that calls your previous agents as subprocesses. Agent mode handles the multi-file wiring:',
         prompt: 'Create `interview_prep_agent.py` using LangGraph:\n\nNodes (run decompose→research+analyse in parallel→assemble→write):\n1. `parse_input` — extract company name, job title, JD text\n2. `research_company` (parallel) — web search: "[company] tech stack", "[company] engineering culture", "[company] recent news 2026", "[company] glassdoor". Synthesise into 3-bullet company brief.\n3. `analyse_jd` (parallel) — extract: must-have skills, nice-to-have, seniority level, 5 likely interview questions\n4. `retrieve_experience` — query Chroma DB from module-4 for each required skill. Collect top matches.\n5. `write_prep_sheet` — generate markdown:\n   - Company Overview (3 bullets from research)\n   - Role Fit Analysis (skills match % + gaps)\n   - 5 STAR answers (each grounded in a NAMED project from Chroma results)\n   - 5 Questions To Ask Them\n   - Salary Note\n   - Red Flags to probe\n\nSave to prep_sheets/{company}-{date}.md\nCLI: `--company "Name" --jd "paste JD"`',
       },
       {
         type: 'cursor-prompt',
         label: 'Deploy as OpenClaw Skill',
-        description: 'Create interview-prep.ts in OpenClaw extensions:',
+        description: 'In Cursor, switch to ~/openclaw/extensions/tools/. Open Agent (Cmd+I) to create the TypeScript skill wrapper:',
         prompt: 'Create OpenClaw AgentSkill `interview-prep.ts`:\n- name: "prep_for_interview"\n- description: "Prepares a full interview prep sheet for a specific company and role. Researches the company, analyses the JD, and generates STAR answers from real portfolio experience. Use when preparing for any interview or screening call."\n- parameters: { company_name: string (required), job_description: string (required) }\n\nHandler: spawn interview_prep_agent.py subprocess, pass args, return prep sheet content.',
       },
       {
@@ -901,25 +902,25 @@ This is called **iterative deepening**. It's how a good analyst actually researc
       {
         type: 'cursor-prompt',
         label: 'Build the Job Finder',
-        description: 'In ~/agent-course/module-7:',
+        description: 'In Cursor, navigate to module-7. Open Agent (Cmd+I) — this uses Playwright which Cursor can scaffold correctly including async patterns and cookie handling:',
         prompt: 'Create `job_finder.py` using Playwright async:\n\n1. Launch Chromium in non-headless mode (visible browser)\n2. Load saved LinkedIn cookies from linkedin_session.json (if exists) to stay logged in\n3. Build a LinkedIn Jobs search URL from: keywords, location, date_posted (last 7 days), remote filter\n4. Scroll to load all jobs (max 25)\n5. Extract per job: title, company, location, URL, Easy Apply available (bool)\n6. Save to found_jobs.json\n7. Function `fetch_job_description(url)`: navigate to job, click "See more", extract full JD text, return clean string plus applicant count if shown\n8. If not logged in: print "Log in to LinkedIn in the browser window, then press Enter". After Enter: save cookies to linkedin_session.json (one-time setup)',
       },
       {
         type: 'cursor-prompt',
         label: 'Build the Job Scorer',
-        description: 'Now score each job against your profile:',
+        description: 'Still in module-7. Open job_finder.py and MEMORY.md in Cursor so they\'re in context, then open Agent (Cmd+I):',
         prompt: 'Create `job_scorer.py`:\n\n1. Load found_jobs.json + JOB_SEARCH_PROFILE YAML section from MEMORY.md\n2. For each Easy Apply job: fetch full JD using job_finder.py\n3. LLM scores each job 1-10 against profile. Return JSON: { score: int, reasoning: str, deal_breakers_hit: list, strengths: list, gaps: list }\n4. Filter: score >= 7 only\n5. Sort descending by score\n6. Save filtered to scored_jobs.json\n7. Print summary table: Company | Role | Score | Top Reason',
       },
       {
         type: 'cursor-prompt',
         label: 'Build Application Prep',
-        description: 'Generate tailored application packages:',
+        description: 'In Cursor, have job_scorer.py open alongside module-4/portfolio_agent.py (you\'ll import it). Open Agent (Cmd+I) — it spans two module folders:',
         prompt: 'Create `application_prep.py`:\n\nFor each job in scored_jobs.json:\n1. Research company (call research_agent.py subprocess)\n2. Retrieve relevant portfolio experience (Chroma DB from module-4)\n3. Generate cover letter: "3 paragraphs. Para 1: Why this specific company (cite company research). Para 2: Why I\'m a strong fit — reference 2 NAMED projects from portfolio context. Para 3: Forward-looking. Tone: confident, specific, human. No clichés. Under 300 words."\n4. Save application package: applications/{company}-{role}-{date}.json with job details, score, company brief, cover letter, portfolio snippets',
       },
       {
         type: 'cursor-prompt',
         label: 'Build the Telegram Review Flow',
-        description: 'Create the human-in-the-loop review:',
+        description: 'Switch to ~/openclaw/extensions/tools/ in Cursor. This is the most important skill you\'ll build — the human-in-the-loop gate. Open Agent (Cmd+I):',
         prompt: 'Create OpenClaw AgentSkill `job-review.ts`:\n- name: "present_job_for_review"\n- Reads application package JSON\n- Sends formatted Telegram message:\n  "🎯 Job Match\\n\\n{Company} — {Role}\\n📊 Score: {X}/10\\n💡 {top reason}\\n\\n✅ Strengths: {list}\\n⚠️ Gaps: {list}\\n\\n📝 Cover letter: \\"{first 150 chars}...\"\\n\\nReply YES to apply, SKIP to pass, DETAIL for full letter"\n- YES → call applicator_skill\n- DETAIL → send full cover letter, ask again\n- SKIP → ask "Why? (salary/role/company/other)" → log to SKIP_LOG.md',
       },
       {
@@ -981,19 +982,19 @@ Your Career Intelligence System uses all three. The orchestrator decides (hierar
       {
         type: 'cursor-prompt',
         label: 'Build the Career Orchestrator',
-        description: 'In ~/agent-course/module-8 — the capstone build:',
+        description: 'In Cursor, open module-8. This is the capstone. Open all five previous agent files as tabs first so Cursor Agent has full context — then open Agent (Cmd+I):',
         prompt: 'Create `career_orchestrator.py` using LangGraph StateGraph.\n\nState includes: user_goal, routing_decision, active_agents, results (dict), final_output, iteration_count\n\nNodes:\n1. `parse_goal` — LLM classifies goal into: RESEARCH | PORTFOLIO_QA | DATA_ANALYSIS | INTERVIEW_PREP | JOB_SEARCH | COMPOUND\n2. `route` — conditional router dispatching to the right handler node\n3. `research_handler` — calls module-3/research_agent.py as subprocess\n4. `portfolio_handler` — calls module-4/portfolio_agent.py as subprocess\n5. `analysis_handler` — calls module-5/analysis_agent.py as subprocess  \n6. `interview_handler` — calls module-6/interview_prep_agent.py as subprocess\n7. `job_handler` — calls module-7 pipeline\n8. `compound_handler` — identifies which agents needed, runs them in PARALLEL using concurrent.futures.ThreadPoolExecutor, combines results\n9. `format_output` — synthesises all agent outputs into one clean response\n\nCompile with StateGraph. Accept goal as sys.argv[1].',
       },
       {
         type: 'cursor-prompt',
         label: 'Add Shared Memory',
-        description: 'Connect all agents with a shared memory store:',
+        description: 'In Cursor, open career_orchestrator.py alongside the module files. Open Agent (Cmd+I) — it creates shared_memory.py and edits the orchestrator to use it:',
         prompt: 'Create `shared_memory.py` — a SQLite-backed memory store all agents share:\n\n1. Database: ~/.openclaw/workspaces/default/shared_memory.db\n2. `remember(key: str, value: str, agent_name: str)` — stores with timestamp\n3. `recall(query: str, limit=10)` — fuzzy text search, returns most relevant facts\n4. `get_context(agent_name: str)` — returns last 10 facts for that agent\'s domain\n5. `get_recent(hours=24)` — all facts from last N hours\n\nUpdate career_orchestrator.py to: call shared_memory.remember() with key findings after each agent runs, call shared_memory.get_context() at the start of each agent invocation.',
       },
       {
         type: 'cursor-prompt',
         label: 'Deploy as Master OpenClaw Skill',
-        description: 'One skill to rule them all:',
+        description: 'Switch to ~/openclaw/extensions/tools/ in Cursor. Open Agent (Cmd+I). This one skill becomes the single entry point for your entire system:',
         prompt: 'Create OpenClaw AgentSkill `career-intelligence.ts`:\n- name: "career_intelligence"\n- description: "The master orchestrator for all career-related tasks. Routes requests to the right specialist agent: research, portfolio Q&A, data analysis, interview prep, or job search. Use this for ANY career, job, project, research, or professional development request. This is the primary skill."\n- parameters: { goal: { type: "string", required: true } }\n- Handler: spawn career_orchestrator.py, timeout 180s, return output.\n\nThis replaces all individual skills as the first entry point.',
       },
       {
@@ -1006,7 +1007,7 @@ Your Career Intelligence System uses all three. The orchestrator decides (hierar
         type: 'callout',
         variant: 'wisdom',
         title: '🔮 Final Words of Wisdom',
-        text: 'You started this course knowing Python and ML. You\'re finishing it knowing how to architect systems where AI does the work. That\'s not a skill upgrade — that\'s a paradigm shift. The website we built for you says "Agentic AI Engineer." It was aspirational on Day 1. It\'s accurate on Day 30.',
+        text: 'You came in knowing Python and ML — which is more than most. You\'re leaving knowing how to architect systems where AI agents do the work, at scale, autonomously, connected to real systems. That\'s a different engineering discipline entirely. The portfolio we built for you says "Agentic AI Engineer." Today, every project in this course is the evidence.',
       },
       {
         type: 'checkpoint',

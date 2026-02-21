@@ -56,7 +56,7 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            Deekshita's Personal Crash Course
+            Deekshita's 30-Day Build Programme
           </motion.div>
           <motion.h1
             className="dashboard-title"
@@ -64,7 +64,7 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            Zero <span className="title-arrow">→</span> Agentic AI Engineer
+            Agentic AI Engineer Playbook
           </motion.h1>
           <motion.p
             className="dashboard-subtitle"

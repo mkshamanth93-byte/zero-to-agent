@@ -26,7 +26,7 @@ export default function Completion() {
           <div className="certificate-border" />
           <div className="certificate-inner">
             <div className="certificate-top">
-              <div className="certificate-logo">Zero → Agent</div>
+              <div className="certificate-logo">Agentic AI Playbook</div>
               <div className="certificate-issued">Certificate of Completion</div>
             </div>
 
@@ -35,7 +35,7 @@ export default function Completion() {
               <h1 className="certificate-name">Deekshita Sridhar</h1>
               <p className="certificate-sub">has successfully completed</p>
               <h2 className="certificate-course">
-                Zero → Agentic AI Engineer
+                Agentic AI Engineer Playbook
               </h2>
               <p className="certificate-desc">
                 A 30-day intensive crash course covering agentic AI systems,
@@ -72,14 +72,13 @@ export default function Completion() {
 
         <div className="completion-message">
           <p>
-            You started this course as a Data Scientist who knew Python and ML.
-            You're finishing it as someone who can architect systems where AI does the work.
+            You came in as a Data Scientist. You're leaving as someone who builds systems where AI agents do the work — autonomously, at scale, connected to the real world.
           </p>
           <p>
-            <strong>That's not a skill upgrade. That's a paradigm shift.</strong>
+            <strong>That's not an upgrade. That's a completely different skill set on top of an already strong foundation.</strong>
           </p>
           <p>
-            The website says "Agentic AI Engineer." It was aspirational on Day 1. Today, it's accurate.
+            The portfolio says "Agentic AI Engineer." On Day 1, it was a target. Today, every project in this course is the proof.
           </p>
         </div>
 

@@ -98,12 +98,22 @@ function formatInline(text) {
 }
 
 function StepBlock({ section }) {
+  const isBash = section.code?.language === 'bash'
   return (
     <motion.div className="step-block"
       initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
       <div className="step-block-header">
         <span className="step-block-num">Step {section.number}</span>
         <span className="step-block-title">{section.title}</span>
+        {isBash && (
+          <span className="step-terminal-badge">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginRight: 4 }}>
+              <polyline points="4 17 10 11 4 5" /><line x1="12" y1="19" x2="20" y2="19"/>
+            </svg>
+            Cursor Terminal
+            <kbd>Ctrl+`</kbd>
+          </span>
+        )}
       </div>
       {section.code && (
         <SyntaxHighlighter language={section.code.language} style={vscDarkPlus} className="step-code">
