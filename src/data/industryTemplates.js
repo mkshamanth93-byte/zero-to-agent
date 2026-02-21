@@ -49,7 +49,7 @@ export const GOAL_TRACKS = [
   {
     id: 'business',
     icon: '⚡',
-    label: 'Automate my business',
+    label: 'Automate my work',
     desc: 'Build an intelligent layer on top of your existing tools and workflows. Reduce the admin, catch exceptions, ship insights. Connect the software you already pay for.',
     examples: ['Daily ops briefing', 'Client communication automation', 'Reporting & reconciliation', 'Invoice chasing', 'Customer onboarding flows'],
   },

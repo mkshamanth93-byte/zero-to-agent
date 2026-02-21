@@ -876,6 +876,11 @@ kbd {
   font-size: 0.7rem; background: var(--card); border: 1px solid var(--border);
   border-radius: 4px; padding: 0.1rem 0.5rem; color: var(--muted);
 }
+.ob-track-example-chip--industry {
+  border-color: rgba(99,102,241,0.3);
+  color: #a5b4fc;
+  background: rgba(99,102,241,0.08);
+}
 
 /* Tool selection */
 .ob-tool-section { margin-bottom: 1.5rem; }

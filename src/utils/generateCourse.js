@@ -162,44 +162,66 @@ function buildMemoryMdGuide(profile, template) {
 
 /**
  * Returns adaptive module overrides for modules 3–8.
+ * LLM content takes priority. Falls back to industry template labels.
+ * Never returns undefined for title/subtitle — always has something contextual.
  */
 export function getAdaptiveModuleOverrides(profile) {
   const template = INDUSTRY_TEMPLATES[profile.industry] || INDUSTRY_TEMPLATES['other']
   const gen = profile.generatedContent || null
+  const ind = template.label
+
+  // Module 7 title: LLM → project track label → industry template goal → generic fallback
+  const m7Goal = template.module7Goal || `${ind} Automation Agent`
+  const m7Title = gen?.module7?.title
+    || (profile.goalTrack === 'project' ? 'Your Custom System Build' : m7Goal.split(' — ')[0])
+  const m7Subtitle = gen?.module7?.subtitle
+    || (profile.goalTrack === 'project'
+        ? shortenProjectDesc(profile.projectDescription)
+        : m7Goal.split(' — ')[1] || m7Goal)
+
+  // Module 8 capstone
+  const m8Capstone = template.module8Capstone || `Full ${ind} Intelligence System`
+  const m8Title = gen?.module8?.capstoneTitle || m8Capstone.split(' — ')[0]
+  const m8Subtitle = gen?.module8?.capstoneDescription || m8Capstone.split(' — ')[1] || 'Connect all agents. Build the orchestrator. Deploy.'
+
+  // Module 6 varies by goal track
+  const m6FallbackTitle = profile.goalTrack === 'career'
+    ? 'Interview & Meeting Prep Agent'
+    : profile.goalTrack === 'personal'
+    ? 'Daily Briefing & Prep Agent'
+    : `${ind} Situation Prep Agent`
 
   return {
     3: {
-      title: gen?.module3?.title,
-      subtitle: gen?.module3?.subtitle || `Build a research agent for ${template.label.toLowerCase()} intelligence.`,
+      title: gen?.module3?.title || `${ind} Research Agent`,
+      subtitle: gen?.module3?.subtitle || `An agent that researches and surfaces intelligence specific to ${ind.toLowerCase()} — automatically.`,
       exampleProject: gen?.module3?.projectBrief,
     },
     4: {
-      title: gen?.module4?.title,
-      subtitle: gen?.module4?.subtitle || `Build a knowledge base from your ${template.label.toLowerCase()} domain.`,
+      title: gen?.module4?.title || `${ind} Knowledge Base`,
+      subtitle: gen?.module4?.subtitle || `A RAG agent that indexes your ${ind.toLowerCase()} documents and answers questions from them.`,
       exampleProject: gen?.module4?.projectBrief,
     },
     5: {
-      title: gen?.module5?.title,
-      subtitle: gen?.module5?.subtitle,
+      title: gen?.module5?.title || `${ind} Data Analysis Agent`,
+      subtitle: gen?.module5?.subtitle || `An agent that analyses your data, writes its own code, and delivers insights — for ${ind.toLowerCase()}.`,
       exampleProject: gen?.module5?.projectBrief,
     },
     6: {
-      title: gen?.module6?.title,
-      subtitle: gen?.module6?.subtitle,
+      title: gen?.module6?.title || m6FallbackTitle,
+      subtitle: gen?.module6?.subtitle || `An agent that briefs and preps you for every high-stakes situation in your ${ind.toLowerCase()} context.`,
       exampleProject: gen?.module6?.projectBrief,
     },
     7: {
-      title: gen?.module7?.title || (profile.goalTrack === 'project' ? 'Your Custom System Build' : undefined),
-      subtitle: gen?.module7?.subtitle || (profile.goalTrack === 'project'
-        ? shortenProjectDesc(profile.projectDescription)
-        : template.module7Goal),
+      title: m7Title,
+      subtitle: m7Subtitle,
       fullBrief: gen?.module7?.fullBrief,
       keyIntegrations: gen?.module7?.keyIntegrations,
       humanApprovalPoints: gen?.module7?.humanApprovalPoints,
     },
     8: {
-      title: gen?.module8?.capstoneTitle,
-      subtitle: gen?.module8?.capstoneDescription || 'Connect all agents. Build the orchestrator. Deploy.',
+      title: m8Title,
+      subtitle: m8Subtitle,
     },
   }
 }

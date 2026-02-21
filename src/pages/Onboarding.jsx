@@ -163,18 +163,24 @@ function StepGoal({ form, onChange, onFocus }) {
       <div className="ob-field" onFocus={() => onFocus('goalTrack')}>
         <label className="ob-label">Your primary goal</label>
         <div className="ob-track-grid">
-          {GOAL_TRACKS.map(track => (
-            <button key={track.id} type="button"
-              className={`ob-track-card ${form.goalTrack === track.id ? 'ob-track-card--selected' : ''}`}
-              onClick={() => { onChange('goalTrack', track.id); onFocus('automationGoal') }}>
-              <div className="ob-track-icon">{track.icon}</div>
-              <div className="ob-track-label">{track.label}</div>
-              <div className="ob-track-desc">{track.desc}</div>
-              <div className="ob-track-examples">
-                {track.examples.map((ex, i) => <span key={i} className="ob-track-example-chip">{ex}</span>)}
-              </div>
-            </button>
-          ))}
+          {GOAL_TRACKS.map(track => {
+            const industryExamples = industry?.automationExamples?.[track.id]
+            const examples = industryExamples || track.examples
+            return (
+              <button key={track.id} type="button"
+                className={`ob-track-card ${form.goalTrack === track.id ? 'ob-track-card--selected' : ''}`}
+                onClick={() => { onChange('goalTrack', track.id); onFocus('automationGoal') }}>
+                <div className="ob-track-icon">{track.icon}</div>
+                <div className="ob-track-label">{track.label}</div>
+                <div className="ob-track-desc">{track.desc}</div>
+                <div className="ob-track-examples">
+                  {examples.slice(0, 4).map((ex, i) => (
+                    <span key={i} className={`ob-track-example-chip ${industryExamples ? 'ob-track-example-chip--industry' : ''}`}>{ex}</span>
+                  ))}
+                </div>
+              </button>
+            )
+          })}
         </div>
       </div>
       {form.goalTrack && (

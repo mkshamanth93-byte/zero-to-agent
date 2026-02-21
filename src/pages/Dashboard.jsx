@@ -138,7 +138,9 @@ export default function Dashboard() {
               <div className="continue-label">Continue where you left off</div>
               <div className="continue-module">
                 <span className="continue-emoji">{nextModule.emoji}</span>
-                <span className="continue-title">Module {nextModule.id}: {nextModule.title}</span>
+                <span className="continue-title">
+                  Module {nextModule.id}: {moduleOverrides[nextModule.id]?.title || nextModule.title}
+                </span>
               </div>
               <div className="continue-days">Days {nextModule.days}</div>
             </div>
@@ -202,8 +204,12 @@ export default function Dashboard() {
                   </div>
 
                   <div className="module-num">Module {mod.id}</div>
-                  <h3 className="module-card-title">{mod.title}</h3>
-                  <p className="module-card-subtitle">{mod.subtitle}</p>
+                  <h3 className="module-card-title">
+                    {moduleOverrides[mod.id]?.title || mod.title}
+                  </h3>
+                  <p className="module-card-subtitle">
+                    {moduleOverrides[mod.id]?.subtitle || mod.subtitle}
+                  </p>
 
                   <div className="module-card-footer">
                     <div className="module-xp">+{mod.xp} XP</div>
