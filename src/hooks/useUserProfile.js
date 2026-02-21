@@ -1,24 +1,25 @@
 import { useState, useCallback } from 'react'
 
 const STORAGE_KEY = 'agentic_user_profile'
+const TOKEN_KEY   = 'agentic_access_token'
 
 export const EMPTY_PROFILE = {
   // Step 1 — Who you are
   name: '',
   role: '',
-  industry: '',          // 'healthcare' | 'finance' | 'legal' | 'hr' | 'operations' | 'tech-career' | 'other'
-  businessType: '',      // 'solo' | 'small' | 'medium' | 'enterprise' | 'personal'
+  industry: '',
+  businessType: '',
   businessDescription: '',
 
   // Step 2 — What you want to build
-  goalTrack: '',         // 'career' | 'business' | 'project'
-  automationGoal: '',    // free text: "the one thing I'd automate"
-  projectDescription: '', // only for 'project' track
+  goalTrack: '',
+  automationGoal: '',
+  projectDescription: '',
 
   // Step 3 — Your tools
-  tools: [],             // multi-select: ['xero', 'hubspot', 'slack', ...]
+  tools: [],
   customTool: '',
-  successVision: '',     // "what does success look like?"
+  successVision: '',
 
   // Meta
   completedAt: null,
@@ -34,6 +35,14 @@ export function useUserProfile() {
     }
   })
 
+  const [accessToken, setAccessToken] = useState(() => {
+    try {
+      return localStorage.getItem(TOKEN_KEY) || null
+    } catch {
+      return null
+    }
+  })
+
   const saveProfile = useCallback((profileData, generatedContent = null) => {
     const complete = {
       ...profileData,
@@ -42,6 +51,21 @@ export function useUserProfile() {
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(complete))
     setProfile(complete)
+  }, [])
+
+  const saveToken = useCallback((token) => {
+    if (token) {
+      localStorage.setItem(TOKEN_KEY, token)
+      setAccessToken(token)
+    }
+  }, [])
+
+  const getToken = useCallback(() => {
+    try {
+      return localStorage.getItem(TOKEN_KEY) || null
+    } catch {
+      return null
+    }
   }, [])
 
   const updateProfile = useCallback((partial) => {
@@ -54,10 +78,21 @@ export function useUserProfile() {
 
   const clearProfile = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY)
+    localStorage.removeItem(TOKEN_KEY)
     setProfile(null)
+    setAccessToken(null)
   }, [])
 
   const hasProfile = Boolean(profile?.completedAt)
 
-  return { profile, hasProfile, saveProfile, updateProfile, clearProfile }
+  return {
+    profile,
+    hasProfile,
+    accessToken,
+    saveProfile,
+    saveToken,
+    getToken,
+    updateProfile,
+    clearProfile,
+  }
 }

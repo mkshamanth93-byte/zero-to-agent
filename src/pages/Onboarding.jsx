@@ -457,98 +457,135 @@ function GeneratingScreen({ generatedData, onDone }) {
   )
 }
 
-// ─── Step 5: Generate ─────────────────────────────────────────────────────────
-function StepGenerate({ form, onGenerated, onSkip }) {
-  const [apiKey, setApiKey] = useState('')
-  const [status, setStatus] = useState('idle')  // idle | generating | done | error
+// ─── Step 5: Access (coupon gate + generation) ────────────────────────────────
+function StepAccess({ form, onGenerated, onSkip, onTokenIssued }) {
+  const [email, setEmail] = useState('')
+  const [coupon, setCoupon] = useState('')
+  const [status, setStatus] = useState('idle')  // idle | redeeming | generating | done | error
   const [error, setError] = useState('')
   const [generatedData, setGeneratedData] = useState(null)
 
-  const handleGenerate = async () => {
-    if (!apiKey.trim().startsWith('sk-')) {
-      setError('API key should start with sk-. Get yours at platform.openai.com/api-keys')
+  const handleSubmit = async () => {
+    if (!email.trim() || !coupon.trim()) {
+      setError('Both email and coupon code are required.')
+      return
+    }
+    if (!email.includes('@')) {
+      setError('Please enter a valid email address.')
       return
     }
     setError('')
-    setStatus('generating')
+    setStatus('redeeming')
 
+    // Step 1: Redeem coupon → get token
+    let token
     try {
-      const generated = await generateWithLLM(apiKey.trim(), form)
+      const res = await fetch('/api/redeem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email.trim(), coupon: coupon.trim() }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setStatus('error')
+        setError(data.error || 'Something went wrong. Try again.')
+        return
+      }
+      token = data.token
+      onTokenIssued(token)  // store in localStorage immediately
+    } catch {
+      setStatus('error')
+      setError('Could not reach the server. Check your connection.')
+      return
+    }
+
+    // Step 2: Generate course
+    setStatus('generating')
+    try {
+      const generated = await generateWithLLM(token, form)
       setGeneratedData(generated)
       setStatus('done')
-      // onGenerated is called by GeneratingScreen after the reveal animation
     } catch (err) {
       setStatus('error')
-      setError(err.message || 'Something went wrong. Try again.')
+      setError(err.message || 'Generation failed. Try again.')
     }
   }
 
-  // Once generating screen signals done (after reveal), advance
   const handleScreenDone = () => onGenerated(generatedData)
 
+  if (status === 'generating' || status === 'done') {
+    return (
+      <GeneratingScreen
+        generatedData={status === 'done' ? generatedData : null}
+        onDone={handleScreenDone}
+      />
+    )
+  }
+
   return (
-    <>
-      {(status === 'generating' || status === 'done') ? (
-        <GeneratingScreen
-          generatedData={status === 'done' ? generatedData : null}
-          onDone={handleScreenDone}
+    <div className="ob-step">
+      <div className="ob-step-heading">
+        <h2>Almost there. Enter your access code.</h2>
+        <p>Your personalised course is about to be generated — your MEMORY.md, your Module 7 project, and tailored content for every domain module.</p>
+      </div>
+
+      <div className="ob-generate-card">
+        <div className="ob-generate-what-label">What gets built for you:</div>
+        {[
+          'Your MEMORY.md — pre-filled with your role, tools, and context',
+          'Your Module 7 project brief — specific to your actual software',
+          'Tailored titles and briefs for modules 3, 4, 5, 6',
+          'A Day 1 message written for your specific situation',
+        ].map((item, i) => (
+          <div key={i} className="ob-generate-item">
+            <span className="ob-generate-item-dot">✦</span> {item}
+          </div>
+        ))}
+      </div>
+
+      <div className="ob-field">
+        <label className="ob-label">Your email <span className="ob-label-hint">— so you can return to your course</span></label>
+        <input
+          className={`ob-input ${error && !email.trim() ? 'ob-input--error' : ''}`}
+          type="email"
+          placeholder="you@example.com"
+          value={email}
+          onChange={e => { setEmail(e.target.value); setError('') }}
+          autoComplete="email"
         />
-      ) : (
-        <div className="ob-step">
-          <div className="ob-step-heading">
-            <h2>Generate your personalised course.</h2>
-            <p>One API call writes your MEMORY.md, designs your Module 7 project, and tailors every module to your world.</p>
-          </div>
+      </div>
 
-          <div className="ob-generate-card">
-            <div className="ob-generate-what-label">What gets generated:</div>
-            {[
-              'Your MEMORY.md — pre-filled with your role, tools, and context',
-              'Your Module 7 project brief — specific to your actual software',
-              'Tailored titles and briefs for modules 3, 4, 5, 6',
-              'A Day 1 message written for your specific situation',
-            ].map((item, i) => (
-              <div key={i} className="ob-generate-item">
-                <span className="ob-generate-item-dot">✦</span> {item}
-              </div>
-            ))}
-            <div className="ob-generate-cost">~$0.002 · one call · key never stored</div>
-          </div>
+      <div className="ob-field">
+        <label className="ob-label">Access code</label>
+        <input
+          className={`ob-input ob-apikey-input ${error ? 'ob-input--error' : ''}`}
+          type="text"
+          placeholder="e.g. BETA01"
+          value={coupon}
+          onChange={e => { setCoupon(e.target.value.toUpperCase()); setError('') }}
+          autoComplete="off"
+          style={{ textTransform: 'uppercase', letterSpacing: '0.08em', fontFamily: 'monospace' }}
+        />
+        {error && <div className="ob-input-error">{error}</div>}
+        {status === 'redeeming' && (
+          <div className="ob-field-note" style={{ color: '#6366f1' }}>Validating code...</div>
+        )}
+      </div>
 
-          <div className="ob-field">
-            <label className="ob-label">
-              Your OpenAI API key
-              <a className="ob-apikey-link" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer">
-                Get yours →
-              </a>
-            </label>
-            <input
-              className={`ob-input ob-apikey-input ${error ? 'ob-input--error' : ''}`}
-              type="password"
-              placeholder="sk-..."
-              value={apiKey}
-              onChange={e => { setApiKey(e.target.value); setError('') }}
-            />
-            {error && <div className="ob-input-error">{error}</div>}
-            <div className="ob-field-note">Used once for generation. Not stored anywhere. You'll add it to your .env in Module 0.</div>
-          </div>
-
-          <div className="ob-generate-actions">
-            <motion.button
-              className={`ob-next-btn ${!apiKey.trim() ? 'ob-next-btn--disabled' : ''}`}
-              onClick={apiKey.trim() ? handleGenerate : undefined}
-              whileHover={apiKey.trim() ? { scale: 1.02 } : {}}
-              whileTap={apiKey.trim() ? { scale: 0.98 } : {}}
-            >
-              Generate my course →
-            </motion.button>
-            <button className="ob-skip-btn" onClick={onSkip}>
-              Skip — use template content instead
-            </button>
-          </div>
-        </div>
-      )}
-    </>
+      <div className="ob-generate-actions">
+        <motion.button
+          className={`ob-next-btn ${(!email.trim() || !coupon.trim() || status === 'redeeming') ? 'ob-next-btn--disabled' : ''}`}
+          onClick={email.trim() && coupon.trim() && status === 'idle' ? handleSubmit : undefined}
+          whileHover={email.trim() && coupon.trim() ? { scale: 1.02 } : {}}
+          whileTap={email.trim() && coupon.trim() ? { scale: 0.98 } : {}}
+        >
+          {status === 'redeeming' ? 'Validating...' : 'Generate my course →'}
+        </motion.button>
+        <button className="ob-skip-btn" onClick={onSkip}>
+          Skip — use template content instead
+        </button>
+      </div>
+    </div>
   )
 }
 
@@ -647,7 +684,7 @@ function StepPreview({ form, generatedContent }) {
 export default function Onboarding() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { saveProfile } = useUserProfile()
+  const { saveProfile, saveToken } = useUserProfile()
   const [step, setStep] = useState(0)
   const [form, setForm] = useState(() => {
     const presetKey = searchParams.get('for')
@@ -782,7 +819,7 @@ export default function Onboarding() {
               {step === 2 && <StepAboutYou form={form} onChange={onChange} onFocus={onFocus} />}
               {step === 3 && <StepGoal form={form} onChange={onChange} onFocus={onFocus} />}
               {step === 4 && <StepTools form={form} onChange={onChange} onFocus={onFocus} />}
-              {step === 5 && <StepGenerate form={form} onGenerated={handleGenerated} onSkip={handleSkipGeneration} />}
+              {step === 5 && <StepAccess form={form} onGenerated={handleGenerated} onSkip={handleSkipGeneration} onTokenIssued={saveToken} />}
               {step === 6 && <StepPreview form={form} generatedContent={generatedContent} />}
             </motion.div>
           </AnimatePresence>
