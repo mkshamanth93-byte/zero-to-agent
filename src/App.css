@@ -398,7 +398,8 @@ kbd {
   letter-spacing: 0.08em; background: var(--accent-dim); padding: 0.15rem 0.5rem; border-radius: 4px;
 }
 .step-block-title { font-size: 0.9rem; font-weight: 600; color: var(--text); }
-.step-code { margin: 0 !important; border-radius: 0 !important; font-size: 0.82rem !important; }
+.step-code { margin: 0 !important; border-radius: 0 !important; font-size: 0.82rem !important; overflow-x: auto !important; }
+.step-block pre { overflow-x: auto; }
 
 /* Checkpoint section */
 .module-checkpoint-section {
@@ -1091,19 +1092,85 @@ kbd {
 }
 
 /* ============================================================ RESPONSIVE ============================================================ */
+
+/* ── Tablet: collapse onboarding two-column layout ── */
+@media (max-width: 860px) {
+  .ob-layout {
+    grid-template-columns: 1fr;
+  }
+  .ob-tips-col {
+    position: static;
+    /* Collapse tips panel on tablet — the form takes priority */
+    display: none;
+  }
+  .ob-layout--single {
+    max-width: 100%;
+  }
+}
+
+/* ── Mobile: 640px and below ── */
 @media (max-width: 640px) {
+  /* Dashboard */
   .dashboard-header { padding: 4rem 1.25rem 2rem; }
   .modules-grid { grid-template-columns: 1fr; }
   .diagram-loop-track { grid-template-columns: 1fr 1fr; }
+  .dashboard-continue { flex-direction: column; align-items: flex-start; }
+
+  /* Module page */
   .module-header { padding: 5rem 1.25rem 2rem; }
   .module-content { padding: 2rem 1.25rem; }
   .module-navigation { padding: 1rem 1.25rem 3rem; flex-direction: column; }
-  .dashboard-continue { flex-direction: column; align-items: flex-start; }
+  .module-nav-btn { width: 100%; justify-content: center; }
+
+  /* Certificate */
   .certificate-name { font-size: 1.8rem; }
+
+  /* Diagrams */
   .diagram-openclaw-layout { flex-direction: column; }
+
+  /* Onboarding landing */
+  .ob-landing { padding: 1.5rem 1rem; align-items: flex-start; padding-top: 3rem; }
+  .ob-landing-cta { align-self: stretch; width: 100%; text-align: center; }
+  .ob-landing-promise { gap: 1.25rem; }
+
+  /* Onboarding form */
+  .ob-page { padding: 1.25rem 1rem; }
+  .ob-step-heading h2 { font-size: 1.3rem; }
+  .ob-next-btn { align-self: stretch; width: 100%; text-align: center; }
+  .ob-segment-label { min-width: unset; }
+  .ob-segment-btn { flex-wrap: wrap; gap: 0.25rem; }
+  .ob-pill-grid { grid-template-columns: 1fr 1fr; }
+
+  /* Step blocks — make code scrollable not clipped */
+  .step-block { overflow: visible; }
+  .step-block-header { flex-wrap: wrap; gap: 0.4rem; }
+  .step-terminal-badge { margin-left: 0; }
+
+  /* Cursor prompt component */
+  .cursor-prompt { margin: 1.25rem 0; }
+  .cursor-prompt-steps { gap: 0.5rem; }
 }
 
+/* ── Small mobile: 480px and below ── */
 @media (max-width: 480px) {
   .dashboard-stats { gap: 0.35rem; }
-  .stat-chip { padding: 0.3rem 0.7rem; }
+  .stat-chip { padding: 0.3rem 0.7rem; font-size: 0.72rem; }
+
+  /* Onboarding */
+  .ob-landing-title { font-size: clamp(1.75rem, 8vw, 2.4rem); }
+  .ob-pill-grid { grid-template-columns: 1fr; }
+  .ob-track-card { padding: 0.9rem 1rem; }
+  .ob-form-header { gap: 0.5rem; }
+  .ob-progress-label { display: none; }
+
+  /* Module page */
+  .module-header-title { font-size: clamp(1.4rem, 6vw, 2rem); }
+  .module-content { padding: 1.5rem 1rem; }
+
+  /* Checkpoint steps */
+  .checkpoint-items { gap: 0.5rem; }
+
+  /* Certificate */
+  .certificate-name { font-size: 1.5rem; }
+  .certificate-card { padding: 2rem 1.25rem; }
 }
