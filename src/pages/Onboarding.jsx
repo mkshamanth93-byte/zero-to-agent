@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useUserProfile, EMPTY_PROFILE } from '../hooks/useUserProfile'
 import { INDUSTRY_OPTIONS, BUSINESS_TYPES, GOAL_TRACKS, COMMON_TOOLS, INDUSTRY_TEMPLATES } from '../data/industryTemplates'
 import { generateCourseProfile } from '../utils/generateCourse'
 import { generateWithLLM, GENERATION_STAGES } from '../utils/llmGenerate'
+import { PRESETS } from '../data/presets'
 
 const TOTAL_STEPS = 5   // 1=who, 2=what, 3=tools, 4=generate, 5=preview
 
@@ -516,11 +517,18 @@ function Step5({ form, generatedContent }) {
 // ─── Main Onboarding ──────────────────────────────────────────────────────────
 export default function Onboarding() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { saveProfile } = useUserProfile()
   const [step, setStep] = useState(0)
-  const [form, setForm] = useState({ ...EMPTY_PROFILE })
+  const [form, setForm] = useState(() => {
+    // Pre-fill from ?for=<preset> query param if present
+    const presetKey = searchParams.get('for')
+    const preset = presetKey && PRESETS[presetKey.toLowerCase()]
+    return preset ? { ...EMPTY_PROFILE, ...preset } : { ...EMPTY_PROFILE }
+  })
   const [activeField, setActiveField] = useState(null)
   const [generatedContent, setGeneratedContent] = useState(null)
+  const isPreset = Boolean(searchParams.get('for') && PRESETS[searchParams.get('for')?.toLowerCase()])
 
   const onChange = (field, value) => setForm(prev => ({ ...prev, [field]: value }))
   const onFocus = (field) => setActiveField(field)
@@ -565,10 +573,23 @@ export default function Onboarding() {
           transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}>
 
           <div className="ob-landing-eyebrow">Agentic AI · 30-Day Build Programme</div>
-          <h1 className="ob-landing-title">Build your personal AI.<br />Tailored to your world.</h1>
-          <p className="ob-landing-desc">
-            This isn't a generic AI course. Answer a few questions about your industry, your tools, and what you want to automate — and the course adapts: the examples, the projects, your MEMORY.md, and your final 30-day build.
-          </p>
+          {isPreset ? (
+            <>
+              <h1 className="ob-landing-title">
+                Hey {form.name}. Your course<br />is waiting.
+              </h1>
+              <p className="ob-landing-desc">
+                Your profile is pre-filled. Review it in the next step, adjust anything that's off, then generate your personalised course — your MEMORY.md, your project brief, your tailored examples.
+              </p>
+            </>
+          ) : (
+            <h1 className="ob-landing-title">Build your personal AI.<br />Tailored to your world.</h1>
+          )}
+          {!isPreset && (
+            <p className="ob-landing-desc">
+              This isn't a generic AI course. Answer a few questions about your industry, your tools, and what you want to automate — and the course adapts: the examples, the projects, your MEMORY.md, and your final 30-day build.
+            </p>
+          )}
 
           <div className="ob-landing-tracks">
             {GOAL_TRACKS.map(track => (
@@ -598,9 +619,11 @@ export default function Onboarding() {
 
           <motion.button className="ob-landing-cta" onClick={handleNext}
             whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
-            Build my custom course →
+            {isPreset ? `Review my profile →` : 'Build my custom course →'}
           </motion.button>
-          <p className="ob-landing-note">5 minutes to set up. 30 days to transform how you work.</p>
+          <p className="ob-landing-note">
+            {isPreset ? 'Takes 2 minutes to review. Then generate your course.' : '5 minutes to set up. 30 days to transform how you work.'}
+          </p>
         </motion.div>
       </div>
     )
