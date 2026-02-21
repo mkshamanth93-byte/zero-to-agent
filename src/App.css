@@ -1004,6 +1004,82 @@ kbd {
 }
 .dashboard-reset-btn:hover { color: var(--text); }
 
+/* ============================================================ DOMAIN BRIEF ============================================================ */
+.domain-brief {
+  margin-bottom: 2.5rem;
+}
+.domain-brief-header {
+  border-left: 3px solid;
+  padding-left: 1.25rem;
+  margin-bottom: 1.75rem;
+}
+.domain-brief-eyebrow {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.12em; font-family: 'JetBrains Mono', monospace;
+  display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.5rem;
+}
+.domain-brief-title {
+  font-size: 1.4rem; font-weight: 700; letter-spacing: -0.02em;
+  color: var(--text); margin: 0 0 0.6rem;
+}
+.domain-brief-brief {
+  font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7; margin: 0;
+}
+.domain-brief-integrations {
+  display: flex; flex-wrap: wrap; gap: 0.4rem; align-items: center; margin-top: 1rem;
+}
+.domain-brief-int-label {
+  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-right: 0.25rem;
+}
+.domain-brief-int-chip {
+  font-size: 0.72rem; border: 1px solid; border-radius: 4px;
+  padding: 0.15rem 0.5rem; font-family: 'JetBrains Mono', monospace;
+}
+.domain-brief-approvals {
+  margin-top: 1rem; padding: 0.85rem 1rem;
+  background: rgba(251,191,36,0.06); border: 1px solid rgba(251,191,36,0.2);
+  border-radius: 8px;
+}
+.domain-brief-approval-label {
+  font-size: 0.72rem; font-weight: 700; color: #fbbf24;
+  text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem;
+}
+.domain-brief-approval-item {
+  font-size: 0.82rem; color: var(--text-secondary); line-height: 1.6;
+  padding-left: 1rem; position: relative;
+}
+.domain-brief-approval-item::before {
+  content: '→'; position: absolute; left: 0; color: #fbbf24;
+}
+.domain-brief-prompts {
+  margin-bottom: 1.75rem;
+}
+.domain-brief-prompts-label {
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+.domain-brief-checkpoints {
+  margin-bottom: 1.25rem;
+}
+.domain-brief-checkpoints-label {
+  font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Universal content toggle */
+.universal-content-toggle {
+  margin: 2rem 0 1rem;
+  border-top: 1px solid var(--border); padding-top: 1.25rem;
+}
+.universal-toggle-btn {
+  background: none; border: none; color: var(--muted); font-size: 0.82rem;
+  cursor: pointer; padding: 0; transition: color 0.2s; font-family: 'JetBrains Mono', monospace;
+}
+.universal-toggle-btn:hover { color: var(--text); }
+
 /* ============================================================ GENERATION STEP ============================================================ */
 .ob-generate-card {
   background: rgba(255,255,255,0.03); border: 1px solid var(--border);
